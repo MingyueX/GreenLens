@@ -37,9 +37,13 @@ dependencies:
   cupertino_icons: ^1.0.2
   chaquopy: ^0.0.19
   drift: ^2.10.0
+  sqlite3_flutter_libs: ^0.5.15
+  path_provider: ^2.0.15
+  path: ^1.8.3
   flutter_bloc: ^8.1.2
   flutter_platform_widgets: ^3.3.5
   intl: ^0.18.1
+  toggle_switch: ^2.1.0
   collection:
 
   ar_flutter_plugin:
@@ -57,6 +61,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  drift_dev: ^2.9.0
+  build_runner: ^2.4.6
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

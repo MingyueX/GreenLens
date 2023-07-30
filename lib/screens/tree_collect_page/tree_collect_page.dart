@@ -57,7 +57,7 @@ class _TreeCollectPageState extends State<TreeCollectPage> {
                                       Theme.of(context).textTheme.headlineLarge,
                                   children: <TextSpan>[
                                     const TextSpan(
-                                      text: "Plot",
+                                      text: "Tree",
                                     ),
                                     TextSpan(
                                         text: "#${index + 1}",

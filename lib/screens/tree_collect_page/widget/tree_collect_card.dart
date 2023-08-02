@@ -4,35 +4,7 @@ import 'package:tree/base/widgets/plain_button.dart';
 import 'package:tree/image_capture_screen.dart';
 import 'package:tree/theme/colors.dart';
 
-enum TreeAliveCondition {
-  normal("Normal", "a"),
-  broken("Broken stem/top & resprouting, or at least live phloem/xylem", "b"),
-  leaning("Leaning by ≥10%", "c"),
-  fallen("Fallen", "d"),
-  fluted("Tree fluted or/fenestrated", "e"),
-  hollow("Hollow", "f"),
-  rotten("Rotten and or presence of bracket fungus", "g"),
-  multiStemmed("Multiple stemmed individual", "h"),
-  noLeaves("No leaves, few leaves", "i"),
-  burnt("Burnt", "j"),
-  snapped("Snapped < 1.3m", "k"),
-  liana("Has liana ≥10cm diameter on stem or in canopy", "l"),
-  coveredByLianas("Covered by lianas", "m"),
-  newRecruit("New recruit", "n"),
-  lightningDamage("Lightning damage", "o"),
-  cut("Cut", "p"),
-  peelingBark("Peeling bark", "q"),
-  hasStrangler("Has a strangler", "s"),
-  hasWound("Has wound and/or cambium exposed", "w"),
-  elephantDamage("Elephant damage", "x"),
-  termiteDamage("Termite damage", "y"),
-  decliningProductivity("Declining productivity", "z");
-
-  const TreeAliveCondition(this.detail, this.statusCode);
-
-  final String detail;
-  final String statusCode;
-}
+import '../../../model/models.dart';
 
 class TreeCollectCard extends StatefulWidget {
   const TreeCollectCard({Key? key}) : super(key: key);

@@ -120,7 +120,7 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen> {
     if (mounted && imageResult != null) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => CaptureConfirm(imageResult: imageResult!),
+          builder: (context) => CaptureConfirm(imageResult: imageResult!, cameraImage: imgRGB, arImage: arImage),
         ),
       );
     }

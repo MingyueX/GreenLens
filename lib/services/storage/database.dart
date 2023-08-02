@@ -8,17 +8,225 @@ import 'package:tree/services/storage/queries.dart';
 import 'package:tree/services/storage/tree/tree_table.dart';
 import 'package:tree/services/storage/farmer/farmer_table.dart';
 
+import '../../model/models.dart';
+
 // generated file, run "dart run build_runner build" to generate
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Farmer, Plot, Tree])
+@DriftDatabase(tables: [FarmerTable, PlotTable, TreeTable])
 class Database extends _$Database {
-  Database() : super(_openConnection());
+  Database._internal() : super(_openConnection());
+  static final Database instance = Database._internal();
 
   @override
   int get schemaVersion => 1;
 
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
+
   DbQuery get dbQuery => DbQuery(db: this);
+
+  // insert functions for farmer, plot, tree
+
+  Future<void> insertFarmer(Farmer farmer) async {
+    await dbQuery.insert(farmerTable, farmerToDb(farmer), null);
+  }
+
+  Future<void> insertPlot(Plot plot) async {
+    await dbQuery.insert(plotTable, plotToDb(plot), null);
+  }
+
+  Future<void> insertTree(Tree tree) async {
+    await dbQuery.insert(treeTable, treeToDb(tree), null);
+  }
+
+  Future<void> insertAllPlot(List<Plot> plots) async {
+    await dbQuery.insertBatch(plotTable, plots.map((p) => plotToDb(p)).toList(), null);
+  }
+
+  Future<void> insertAllTree(List<Tree> trees) async {
+    await dbQuery.insertBatch(treeTable, trees.map((t) => treeToDb(t)).toList(), null);
+  }
+
+  // search functions for plot
+  Future<Plot?> searchPlotById(int id) async {
+    final plot = await dbQuery.select(plotTable, (p) => p.id.equals(id));
+
+    return Future.sync(() => plotFromDb(plot as PlotTableData));
+  }
+
+  Future<List<Plot>> searchPlotByFarmerId(int id) async {
+    final plotList = await dbQuery.search(plotTable, (p) => p.farmerId.equals(id));
+
+    return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
+  }
+
+  Future<List<Plot>> searchPlotByClusterId(int id) async {
+    final plotList = await dbQuery.search(plotTable, (p) => p.clusterId.equals(id));
+
+    return plotList.map((p) => plotFromDb(p as PlotTableData)).toList();
+  }
+
+  Future<List<Plot>> searchPlotByGroupId(int id) async {
+    final plotList = await dbQuery.search(plotTable, (p) => p.groupId.equals(id));
+
+    return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
+  }
+
+  // search functions for tree
+  Future<Tree> searchTreeById(int id) async {
+    final tree = await dbQuery.select(treeTable, (t) => t.id.equals(id));
+
+    return Future.sync(() => treeFromDb(tree as TreeTableData));
+  }
+
+  Future<List<Tree>> searchTreeByPlotId(int id) async {
+    final treeList = await dbQuery.search(treeTable, (t) => t.plotId.equals(id));
+
+    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
+  }
+
+  Future<List<Tree>> searchTreeBySpeciesId(int id) async {
+    final treeList = await dbQuery.search(treeTable, (t) => t.speciesId.equals(id));
+
+    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
+  }
+
+  Future<List<Tree>> searchTreeByTreeCondition(TreeCondition cond) async {
+    final treeList = await dbQuery.search(treeTable, (t) => t.treeCondition.equals(cond.name));
+
+    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
+  }
+
+  Future<List<Tree>> searchTreeByDiameter(int minDiameter, int maxDiameter) async {
+    bool filter(TreeTableData t) => t.diameter != null && t.diameter! >= minDiameter && t.diameter! <= maxDiameter;
+    final treeList = await dbQuery.search(treeTable, (t) => filter(t));
+
+    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
+  }
+
+  Future<void> updateFarmer(Farmer f) async {
+    await dbQuery.update(farmerTable, farmerToDb(f));
+  }
+
+  Future<void> updatePlot(Plot p) async {
+    await dbQuery.update(plotTable, plotToDb(p));
+  }
+
+  Future<void> updateTree(Tree t) async {
+    await dbQuery.update(treeTable, treeToDb(t));
+  }
+
+  Future<void> deleteFarmer(Farmer f) async {
+    await dbQuery.delete(farmerTable, farmerToDb(f));
+  }
+
+  Future<void> deletePlot(Plot p) async {
+    await dbQuery.delete(plotTable, plotToDb(p));
+  }
+
+  Future<void> deleteTree(Tree t) async {
+    await dbQuery.delete(treeTable, treeToDb(t));
+  }
+
+  Future<void> deletePlotList(List<Plot> plots) async {
+    await dbQuery.deleteBatch(plotTable, plots.map((p) => plotToDb(p)).toList());
+  }
+
+  Future<void> deleteTreeList(List<Tree> trees) async {
+    await dbQuery.deleteBatch(treeTable, trees.map((t) => treeToDb(t)).toList());
+  }
+
+  Future<void> deleteAll() async {
+    await dbQuery.deleteAll(treeTable);
+    await dbQuery.deleteAll(plotTable);
+    await dbQuery.deleteAll(farmerTable);
+  }
+
+
+
+  // Conversion for Farmer
+  FarmerTableCompanion farmerToDb(Farmer f) {
+    return FarmerTableCompanion(
+      id: const Value.absent(),
+      name: Value(f.name),
+      participantId: Value(f.participantId),
+    );
+  }
+
+  Farmer farmerFromDb(FarmerTableData f) {
+    return Farmer(
+      id: f.id,
+      name: f.name,
+      participantId: f.participantId,
+    );
+  }
+
+  // Conversion for Plot
+  PlotTableCompanion plotToDb(Plot p) {
+    return PlotTableCompanion(
+      id: const Value.absent(),
+      farmerId: Value(p.farmerId),
+      clusterId: Value(p.clusterId),
+      groupId: Value(p.groupId),
+      farmId: Value(p.farmId),
+      date: Value(p.date),
+      harvesting: Value(p.harvesting),
+      thinning: Value(p.thinning),
+      dominantLandUse: Value(p.dominantLandUse),
+    );
+  }
+
+  Plot plotFromDb(PlotTableData p) {
+    return Plot(
+      id: p.id,
+      farmerId: p.farmerId,
+      clusterId: p.clusterId,
+      groupId: p.groupId,
+      farmId: p.farmId,
+      date: p.date,
+      harvesting: p.harvesting,
+      thinning: p.thinning,
+      dominantLandUse: p.dominantLandUse,
+    );
+  }
+
+  // Conversion for Tree
+  TreeTableCompanion treeToDb(Tree t) {
+    return TreeTableCompanion(
+      id: const Value.absent(),
+      plotId: Value(t.plotId),
+      diameter: Value(t.diameter),
+      locationLatitude: Value(t.locationLatitude),
+      locationLongitude: Value(t.locationLongitude),
+      orientation: Value(t.orientation),
+      speciesId: Value(t.speciesId),
+      isEucalyptus: Value(t.isEucalyptus),
+      condition: Value(t.condition.name),
+      detail: Value(t.conditionDetail?.statusCode),
+      causeOfDeath: Value(t.causeOfDeath),
+    );
+  }
+
+  Tree treeFromDb(TreeTableData t) {
+    return Tree(
+      id: t.id,
+      plotId: t.plotId,
+      diameter: t.diameter,
+      locationLatitude: t.locationLatitude,
+      locationLongitude: t.locationLongitude,
+      orientation: t.orientation,
+      speciesId: t.speciesId,
+      isEucalyptus: t.isEucalyptus,
+      condition: TreeCondition.fromString(t.condition),
+      conditionDetail: TreeAliveCondition.fromString(t.detail),
+      causeOfDeath: t.causeOfDeath,
+    );
+  }
 }
 
 LazyDatabase _openConnection() {

@@ -2,37 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:tree/base/widgets/date.dart';
 
-enum LandUse {
-  water,
-  bare,
-  savannah,
-  city,
-  treeFarm,
-  fieldCropFarm,
-  forestPreserve,
-  other;
-
-  get name {
-    switch (this) {
-      case LandUse.water:
-        return "Water";
-      case LandUse.bare:
-        return "Bare";
-      case LandUse.savannah:
-        return "Savannah";
-      case LandUse.city:
-        return "City/Village/Town";
-      case LandUse.treeFarm:
-        return "Tree Farm";
-      case LandUse.fieldCropFarm:
-        return "Field Crop Farm";
-      case LandUse.forestPreserve:
-        return "Forest Preserve";
-      case LandUse.other:
-        return "Other";
-    }
-  }
-}
+import '../../../model/models.dart';
 
 class PlotCollectCard extends StatefulWidget {
   const PlotCollectCard({Key? key}) : super(key: key);

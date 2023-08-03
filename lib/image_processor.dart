@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:chaquopy/chaquopy.dart';
 import 'package:flutter/material.dart';
+import 'package:tree/utils/image_util.dart';
 
 import 'image_processor_interface.dart';
 
@@ -23,6 +24,8 @@ import base64
 import numpy as np
 import improc
 
+sys.stderr = open(os.devnull, 'w')
+
 rgb_arr = base64.b64decode("$rgbMatBase64")
 
 dBuffer = np.fromstring("$dBufferStr", sep=',')
@@ -33,6 +36,7 @@ print(result)
 
 ''';
     final result = await Chaquopy.executeCode(code);
+    print(result);
     print(result['textOutputOrError']);
 
     Map<String, dynamic> resultJson = jsonDecode(result['textOutputOrError']);
@@ -46,7 +50,7 @@ print(result)
 
     ImageResult imageResult = ImageResult();
 
-    ui.Image image = await decodeImageFromList(rgbDisp, SHAPE[1], SHAPE[0]);
+    ui.Image image = await ImageUtil.decodeImageFromList(rgbDisp, SHAPE[1], SHAPE[0]);
 
     imageResult.displayImage = image;
     imageResult.rgbImage = raw.rgbMat;
@@ -61,13 +65,5 @@ print(result)
 
 
     return imageResult;
-  }
-
-  Future<ui.Image> decodeImageFromList(Uint8List imageBytes, int width, int height) {
-    final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromPixels(imageBytes, width, height, ui.PixelFormat.rgba8888, (ui.Image img) {
-      completer.complete(img);
-    });
-    return completer.future;
   }
 }

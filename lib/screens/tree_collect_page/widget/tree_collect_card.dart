@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:tree/base/widgets/plain_button.dart';
 import 'package:tree/image_capture_screen.dart';
@@ -17,6 +20,34 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
   static const double spacing = 15;
 
   TreeAliveCondition? selectedCondition;
+  final _latController = TextEditingController();
+  final _longController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _getLocation();
+  }
+
+  _getLocation() async {
+    PermissionStatus status = await Permission.locationWhenInUse.status;
+
+    if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
+      // Request permission
+      status = await Permission.locationWhenInUse.request();
+    }
+
+    if (status.isGranted) {
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _latController.text = position.latitude.toStringAsFixed(2);
+        _longController.text = position.longitude.toStringAsFixed(2);
+      });
+    } else {
+      // TODO: Handle the case when permission is not granted
+      print('Location permission not granted');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,9 +139,35 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
 
           const SizedBox(height: spacing),
           Text("Location", style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: spacing),
-          Text("Orientation",
-              style: Theme.of(context).textTheme.headlineMedium),
+          /*const SizedBox(height: spacing),*/
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+            Expanded(child:
+              PlatformTextFormField(
+                controller: _latController,
+                enabled: false,
+                textAlign: TextAlign.start,
+                material: (_, __) => MaterialTextFormFieldData(
+                  decoration: const InputDecoration(
+                    labelText: "Latitude",
+                  ),
+                ),
+              )),
+              const SizedBox(width: 25),
+            Expanded(child:
+            PlatformTextFormField(
+              controller: _longController,
+              enabled: false,
+              textAlign: TextAlign.start,
+              material: (_, __) => MaterialTextFormFieldData(
+                decoration: const InputDecoration(
+                  labelText: "Longitude",
+                ),
+              ),
+            )),
+            ],
+          ),
           const SizedBox(height: spacing),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

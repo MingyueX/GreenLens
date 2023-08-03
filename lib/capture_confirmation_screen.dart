@@ -3,6 +3,8 @@ import 'package:ar_flutter_plugin/models/camera_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tree/image_processor_interface.dart';
 import 'package:tree/painter_on_image.dart';
+import 'package:tree/utils/image_util.dart';
+import 'dart:ui' as ui;
 
 class CaptureConfirm extends StatelessWidget {
   const CaptureConfirm(
@@ -37,14 +39,21 @@ class CaptureConfirm extends StatelessWidget {
                 child: const Text("Re-capture"),
               ),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        body: DraggableImagePainter(cameraImage: cameraImage,),
+                onPressed: () async {
+                  ui.Image image =
+                      await ImageUtil.cameraImageToUiImage(cameraImage);
+                  if (context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          body: DraggableImagePainter(
+                            image: image,
+                            cameraImage: cameraImage,
+                          ),
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 },
                 child: const Text("Optimize"),
               ),

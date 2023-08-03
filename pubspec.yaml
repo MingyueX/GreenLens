@@ -44,6 +44,9 @@ dependencies:
   flutter_platform_widgets: ^3.3.5
   intl: ^0.18.1
   toggle_switch: ^2.1.0
+  geolocator: ^9.0.2
+  vector_math: ^2.1.4
+  permission_handler: ^10.4.3
   collection:
 
   ar_flutter_plugin:

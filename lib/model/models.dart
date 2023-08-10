@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 class Farmer {
   final int? id;
   final String name;
@@ -68,22 +70,24 @@ enum LandUse {
 }
 
 class Tree {
-  final int? id;
+  int? id;
   final int plotId;
-  final double? diameter;
-  final double locationLatitude;
-  final double locationLongitude;
-  final double? orientation;
-  final int? speciesId;
-  final bool isEucalyptus;
-  final TreeCondition condition;
-  final TreeAliveCondition? conditionDetail;
-  final String? causeOfDeath;
+  double? diameter;
+  ui.Image? displayImage;
+  double locationLatitude;
+  double locationLongitude;
+  double? orientation;
+  int? speciesId;
+  bool isEucalyptus;
+  TreeCondition condition;
+  TreeAliveCondition? conditionDetail;
+  String? causeOfDeath;
 
   Tree({
     this.id,
     required this.plotId,
     this.diameter,
+    this.displayImage,
     required this.locationLatitude,
     required this.locationLongitude,
     this.orientation,

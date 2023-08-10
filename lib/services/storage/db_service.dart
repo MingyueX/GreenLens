@@ -37,6 +37,8 @@ class DatabaseService {
 
   Future<void> deletePlot(Plot plot) => db.deletePlot(plot);
 
+  Future<void> deletePlotById(int id) => db.deletePlotById(id);
+
   Future<void> deleteTree(Tree tree) => db.deleteTree(tree);
 
   Future<void> deleteAllPlot(List<Plot> plots) => db.deletePlotList(plots);

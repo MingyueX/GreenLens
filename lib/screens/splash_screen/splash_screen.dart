@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tree/screens/profile_page/profile_page.dart';
+import 'package:tree/screens/profile_collect_page/profile_collect_page.dart';
 import 'package:tree/screens/splash_screen/splash_screen_viewmodel.dart';
 
 import '../../base/custom_route.dart';
@@ -30,7 +30,7 @@ class SplashScreen extends StatelessWidget {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                          builder: (context) => const ProfilePage()),
+                          builder: (context) => const ProfileCollectPage()),
                       (route) => false);
                 });
               }

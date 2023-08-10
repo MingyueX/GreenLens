@@ -23,6 +23,10 @@ class DbQuery {
     return db.delete(table).delete(entry);
   }
 
+  Future<void> deleteWhere(TableInfo<Table, Insertable> table, Function filter) {
+    return (db.delete(table)..where((row) => filter(row))).go();
+  }
+
   Future<void> deleteBatch(TableInfo<Table, Insertable> table, final List<Insertable> entries) async {
     return await db.batch((batch) {
       for (var entry in entries) {

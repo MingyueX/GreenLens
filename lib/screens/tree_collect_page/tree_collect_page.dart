@@ -79,7 +79,7 @@ class _TreeCollectPageState extends State<TreeCollectPage> {
                           onPressed: () {
                             setState(() {
                               plotList.add(TreeWidget(
-                                  treeCard: const TreeCollectCard()));
+                                  treeCard: TreeCollectCard()));
                             });
                           }),
                       const SizedBox(height: 20),

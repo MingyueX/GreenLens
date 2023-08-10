@@ -36,6 +36,12 @@ extension Themes on ThemeData {
             fontWeight: FontWeight.w700,
             color: AppColors.baseBlack.withOpacity(0.8),
           ),
+          bodyLarge: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+            color: AppColors.baseBlack,
+          ),
           bodySmall: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14.0,
@@ -116,6 +122,26 @@ extension CustomTextTheme on TextTheme {
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
           color: AppColors.primaryGreen,
+        );
+  }
+
+  TextStyle get appbarTitle {
+    return labelMedium?.copyWith(color: AppColors.baseWhite, fontWeight: FontWeight.w600) ??
+        const TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 20.0,
+          fontWeight: FontWeight.w600,
+          color: AppColors.baseWhite,
+        );
+  }
+
+  TextStyle get bodyMediumBold {
+    return bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
+        const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+          color: AppColors.baseBlack,
         );
   }
 }

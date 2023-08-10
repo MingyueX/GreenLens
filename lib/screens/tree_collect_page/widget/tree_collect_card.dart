@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:tree/base/widgets/plain_button.dart';
-import 'package:tree/image_capture_screen.dart';
+import 'package:tree/screens/image_capture_page/image_capture_screen.dart';
 import 'package:tree/theme/colors.dart';
 
+import '../../../img_result_provider.dart';
 import '../../../model/models.dart';
 
 class TreeCollectCard extends StatefulWidget {
@@ -22,6 +24,7 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
   TreeAliveCondition? selectedCondition;
   final _latController = TextEditingController();
   final _longController = TextEditingController();
+  final _diameterController = TextEditingController();
 
   @override
   void initState() {
@@ -38,7 +41,8 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
     }
 
     if (status.isGranted) {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _latController.text = position.latitude.toStringAsFixed(2);
         _longController.text = position.longitude.toStringAsFixed(2);
@@ -51,6 +55,8 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
 
   @override
   Widget build(BuildContext context) {
+    final imageResult = Provider.of<ImgResultProvider>(context).imageResult;
+
     final List<DropdownMenuEntry<TreeAliveCondition>> conditionEntries =
         <DropdownMenuEntry<TreeAliveCondition>>[];
     for (final TreeAliveCondition condition in TreeAliveCondition.values) {
@@ -91,11 +97,13 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
           SizedBox(height: 12),
           DropdownButtonFormField(
               decoration: const InputDecoration(
-                border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.grey)),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.grey)),
-                focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.grey)),
-                  contentPadding: EdgeInsets.only(left: 10)
-              ),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.grey)),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.grey)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.grey)),
+                  contentPadding: EdgeInsets.only(left: 10)),
               hint: Text("Select Condition Details"),
               menuMaxHeight: 250,
               focusColor: AppColors.primaryGreen,
@@ -116,35 +124,14 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
                   selectedCondition = condition;
                 });
               }),
-
-          /*DropdownMenu<TreeAliveCondition>(
-            initialSelection: TreeAliveCondition.normal,
-            label: const Text('Color'),
-            dropdownMenuEntries: conditionEntries,
-            onSelected: (TreeAliveCondition? condition) {
-              setState(() {
-                selectedCondition = condition;
-              });
-            },
-            menuStyle: MenuStyle(
-              shape: MaterialStateProperty.all(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                ),
-              ),
-              minimumSize: MaterialStateProperty.all(Size(285, 25)),
-              maximumSize: MaterialStateProperty.all(Size(285, 200)),
-            ),
-          ),*/
-
           const SizedBox(height: spacing),
           Text("Location", style: Theme.of(context).textTheme.headlineMedium),
           /*const SizedBox(height: spacing),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-            Expanded(child:
-              PlatformTextFormField(
+              Expanded(
+                  child: PlatformTextFormField(
                 controller: _latController,
                 enabled: false,
                 textAlign: TextAlign.start,
@@ -155,31 +142,68 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
                 ),
               )),
               const SizedBox(width: 25),
-            Expanded(child:
-            PlatformTextFormField(
-              controller: _longController,
-              enabled: false,
-              textAlign: TextAlign.start,
-              material: (_, __) => MaterialTextFormFieldData(
-                decoration: const InputDecoration(
-                  labelText: "Longitude",
+              Expanded(
+                  child: PlatformTextFormField(
+                controller: _longController,
+                enabled: false,
+                textAlign: TextAlign.start,
+                material: (_, __) => MaterialTextFormFieldData(
+                  decoration: const InputDecoration(
+                    labelText: "Longitude",
+                  ),
                 ),
-              ),
-            )),
+              )),
             ],
           ),
           const SizedBox(height: spacing),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Diameter(m)",
                   style: Theme.of(context).textTheme.headlineMedium),
-              PlainButton(
-                  buttonPrompt: "CAPTURE➜",
+              /*Container(
+                  width: 185,
+                  height: 25,
+                  child: Stack(children: [
+                    TextField(
+                      controller: _diameterController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.grey)),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.grey)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.grey)),
+                      ),
+                    ),
+                    Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 2),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ImageCaptureScreen()));
+                                },
+                                child: Text(
+                                  imageResult == null
+                                      ? "CAPTURE➜"
+                                      : "RE-CAPTURE➜",
+                                ))))
+                  ]))*/
+              if (imageResult != null)
+                Text(imageResult.diameter.toStringAsFixed(2)),
+              ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const ImageCaptureScreen()));
-                  })
+                  },
+                  child: Text(
+                    imageResult == null ? "CAPTURE➜" : "RE-CAPTURE➜",
+                  ))
             ],
           ),
           const SizedBox(height: spacing),

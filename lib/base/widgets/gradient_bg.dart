@@ -12,18 +12,20 @@ class GradientBg extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.center,
-            colors: colors ??
-                [
-                  AppColors.gradientBgTop,
-                  AppColors.gradientBgBottom,
-                ],
-          ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: padding),
-        child: child);
+        color: AppColors.baseWhite,
+        child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.center,
+                colors: colors ??
+                    [
+                      AppColors.gradientBgTop,
+                      AppColors.gradientBgBottom,
+                    ],
+              ),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: child));
   }
 }

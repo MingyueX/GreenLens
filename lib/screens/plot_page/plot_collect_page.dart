@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tree/base/widgets/confirm_button.dart';
 import 'package:tree/base/widgets/plain_button.dart';
+import 'package:tree/farmer_provider.dart';
 import 'package:tree/screens/plot_list_page/collected_plot_list.dart';
 import 'package:tree/screens/plot_page/widget/plot_collect_card.dart';
 
@@ -28,6 +30,8 @@ class _PlotCollectPageState extends State<PlotCollectPage> {
 
   @override
   Widget build(BuildContext context) {
+    final farmerID = Provider.of<FarmerProvider>(context).farmer?.participantId;
+
     return Scaffold(
         body: GradientBg(
             child: Padding(
@@ -56,7 +60,7 @@ class _PlotCollectPageState extends State<PlotCollectPage> {
                                       Theme.of(context).textTheme.headlineLarge,
                                   children: <TextSpan>[
                                     const TextSpan(
-                                      text: "Plot",
+                                      text: 'Plot',
                                     ),
                                     TextSpan(
                                         text: "#${index + 1}",

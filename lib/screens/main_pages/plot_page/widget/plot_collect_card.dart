@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:tree/base/widgets/check_box.dart';
 import 'package:tree/base/widgets/date.dart';
 import 'package:tree/farmer_provider.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
 
-import '../../../model/models.dart';
+import '../../../../base/widgets/confirm_button.dart';
+import '../../../../model/models.dart';
 
 class PlotCollectCard extends StatefulWidget {
   const PlotCollectCard({Key? key}) : super(key: key);
@@ -18,9 +20,9 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
   bool isHarvesting = false;
   bool isThinning = false;
   LandUse? selectedLandUse = LandUse.water;
-  TextEditingController _clusterIdController = TextEditingController();
-  TextEditingController _groupIdController = TextEditingController();
-  TextEditingController _farmIdController = TextEditingController();
+  final TextEditingController _clusterIdController = TextEditingController();
+  final TextEditingController _groupIdController = TextEditingController();
+  final TextEditingController _farmIdController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -40,17 +42,17 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
             children: [
               RichText(
                 text: TextSpan(
-                  style:
-                  Theme.of(context).textTheme.headlineLarge,
-                  children: <TextSpan>[
-                    const TextSpan(
-                      text: 'Plot',
-                    ),
+                  style: Theme.of(context).textTheme.headlineLarge,
+                  children: const <TextSpan>[
                     TextSpan(
+                      text: 'New Plot',
+                    ),
+                    // TODO: review after confirmed plot id
+                    /*TextSpan(
                         text: "#${viewModel.state.plots.length + 1}",
                         style: Theme.of(context)
                             .textTheme
-                            .labelMedium)
+                            .labelMedium)*/
                   ],
                 ),
               ),
@@ -121,36 +123,24 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text("Harvesting in progress?",
                     style: Theme.of(context).textTheme.headlineMedium),
-                Checkbox(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
-                    fillColor: isHarvesting
-                        ? MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.primary)
-                        : null,
-                    value: isHarvesting,
-                    onChanged: (bool? value) {
+                CheckBoxWithText(
+                    onChange: (bool value) {
                       setState(() {
-                        isHarvesting = value!;
+                        isHarvesting = value;
                       });
-                    })
+                    },
+                    currentValue: isHarvesting)
               ]),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text("Thinning in progress?",
                     style: Theme.of(context).textTheme.headlineMedium),
-                Checkbox(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
-                    fillColor: isThinning
-                        ? MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.primary)
-                        : null,
-                    value: isThinning,
-                    onChanged: (bool? value) {
+                CheckBoxWithText(
+                    onChange: (bool value) {
                       setState(() {
-                        isThinning = value!;
+                        isThinning = value;
                       });
-                    })
+                    },
+                    currentValue: isThinning)
               ]),
               const SizedBox(height: spacing),
               Text("Dominant land use surrounding the plot:",
@@ -180,28 +170,30 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
                   );
                 }).toList(),
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
-                      return;
-                    }
-                    final farmerId =
-                        Provider.of<FarmerProvider>(context, listen: false)
-                            .farmer
-                            .participantId;
-                    Plot plot = Plot(
-                        clusterId: int.parse(_clusterIdController.text),
-                        groupId: int.parse(_groupIdController.text),
-                        farmId: int.parse(_farmIdController.text),
-                        harvesting: isHarvesting,
-                        thinning: isThinning,
-                        dominantLandUse: selectedLandUse!.name,
-                        date: DateTime.now(),
-                        farmerId: farmerId);
-                    viewModel.addPlot(plot);
-                    Navigator.pop(context);
-                  },
-                  child: Text("Save"))
+              ConfirmButton(
+                onPressed: () {
+                  if (_formKey.currentState == null ||
+                      !_formKey.currentState!.validate()) {
+                    return;
+                  }
+                  final farmerId =
+                      Provider.of<FarmerProvider>(context, listen: false)
+                          .farmer
+                          .participantId;
+                  Plot plot = Plot(
+                      clusterId: int.parse(_clusterIdController.text),
+                      groupId: int.parse(_groupIdController.text),
+                      farmId: int.parse(_farmIdController.text),
+                      harvesting: isHarvesting,
+                      thinning: isThinning,
+                      dominantLandUse: selectedLandUse!.name,
+                      date: DateTime.now(),
+                      farmerId: farmerId);
+                  viewModel.addPlot(plot);
+                  Navigator.pop(context);
+                },
+                buttonPrompt: "Save",
+              )
             ],
           ),
         ));

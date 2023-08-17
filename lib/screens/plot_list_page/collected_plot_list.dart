@@ -4,6 +4,7 @@ import 'package:tree/screens/tree_collect_page/tree_collect_page.dart';
 import '../../base/widgets/confirm_button.dart';
 import '../../base/widgets/gradient_bg.dart';
 
+/// deprecated page, used nowhere for now
 class CollectedPlotList extends StatelessWidget {
   const CollectedPlotList({Key? key, required this.plotIds}) : super(key: key);
 

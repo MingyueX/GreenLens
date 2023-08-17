@@ -86,6 +86,26 @@ class ProfilePage extends StatelessWidget {
               const SizedBox(height: 10),
 
               // TODO: MENU
+              const Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.switch_account, color: AppColors.grey),
+                    title: Text("Switch Account"),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.dark_mode, color: AppColors.grey),
+                    title: Text("Mode"),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.settings, color: AppColors.grey),
+                    title: Text("Settings"),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.help, color: AppColors.grey),
+                    title: Text("Help"),
+                  ),
+                ],
+              )
             ],
           ),
         ),

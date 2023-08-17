@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tree/theme/colors.dart';
 
 import '../../../base/widgets/gradient_bg.dart';
-import 'widget/plot_collect_card.dart';
+import 'widget/tree_collect_card.dart';
 
-class AddPlotPage extends StatelessWidget {
-  const AddPlotPage({Key? key}) : super(key: key);
+class AddTreePage extends StatelessWidget {
+  const AddTreePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,6 @@ class AddPlotPage extends StatelessWidget {
                           horizontal: 10,
                         ),
                         child:
-                            Card(elevation: 1.0, child: PlotCollectCard()))))));
+                            Card(color: AppColors.baseWhite, elevation: 1.0, child: TreeCollectCard()))))));
   }
 }

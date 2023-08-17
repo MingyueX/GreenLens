@@ -4,9 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:tree/base/widgets/plain_button.dart';
 import 'package:tree/screens/main_pages/plot_page/new_plot_collection.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
+import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
+import 'package:tree/screens/page_navigation/page_nav_viewmodel.dart';
 import 'package:tree/theme/themes.dart';
 
-import '../../../base/widgets/gradient_bg.dart';
 import '../../../model/models.dart';
 import '../../../theme/colors.dart';
 
@@ -19,8 +20,11 @@ class PlotPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<PlotPageViewModel>();
 
-    return GradientBg(child: SingleChildScrollView(child:
-        BlocBuilder<PlotPageViewModel, PlotsState>(builder: (context, state) {
+    return Container(
+        color: AppColors.lightBackground,
+        child:
+      BlocBuilder<PlotPageViewModel, PlotsState>(
+        builder: (context, state) {
       if (state.plots.isEmpty) {
         return Center(
             child: PlainButton(
@@ -32,41 +36,42 @@ class PlotPage extends StatelessWidget {
                 buttonPrompt: "+ ADD PLOT"));
       } else {
         return Container(
-            padding: const EdgeInsets.all(0),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             height: 580,
             child: ListView.separated(
               itemCount: state.plots.length,
               itemBuilder: (BuildContext context, int index) {
                 return PlotItem(
                   plot: state.plots[index],
-                  id: index + 1,
                   onDelete: (plot) => viewModel.removePlot(plot),
                 );
               },
               separatorBuilder: (BuildContext context, int index) {
-                return const Divider();
+                return const SizedBox(height: 5);
               },
             ));
       }
-    })));
+    }));
   }
 }
 
 class PlotItem extends StatelessWidget {
-  const PlotItem(
-      {Key? key, required this.plot, required this.id, required this.onDelete})
+  const PlotItem({Key? key, required this.plot, required this.onDelete})
       : super(key: key);
 
-  final int id;
+  // TODO: review after decide on plot id
+  // final int id;
   final Plot plot;
 
   final Function onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -81,8 +86,7 @@ class PlotItem extends StatelessWidget {
                               text: 'Plot',
                             ),
                             TextSpan(
-                                // TODO: check if it's safe to use plot.id here
-                                text: "#$id",
+                                text: "#${plot.id}",
                                 style: Theme.of(context).textTheme.labelMedium)
                           ],
                         ),
@@ -115,21 +119,22 @@ class PlotItem extends StatelessWidget {
                       TwoSegRichText(seg1: 'Group', seg2: '#${plot.groupId}'),
                       TwoSegRichText(seg1: 'Farm', seg2: '#${plot.farmId}')
                     ]),
-                const SizedBox(
-                  height: 5,
-                ),
                 if (plot.harvesting)
-                  const TwoSegRichText(
-                    seg1: "Harvesting",
-                    seg2: " in progress",
-                    leadingBold: true,
-                  ),
+                  const Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: TwoSegRichText(
+                        seg1: "Harvesting",
+                        seg2: " in progress",
+                        leadingBold: true,
+                      )),
                 if (plot.thinning)
-                  const TwoSegRichText(
-                    seg1: "Thinning",
-                    seg2: " in progress",
-                    leadingBold: true,
-                  ),
+                  const Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: TwoSegRichText(
+                        seg1: "Thinning",
+                        seg2: " in progress",
+                        leadingBold: true,
+                      )),
                 const SizedBox(
                   height: 5,
                 ),
@@ -138,20 +143,38 @@ class PlotItem extends StatelessWidget {
                 const SizedBox(
                   height: 5,
                 ),
-                const PlainButton(buttonPrompt: "VIEW TREE INFO"),
-                const SizedBox(
-                  height: 5,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    PlainButton(
+                        onPressed: () {
+                          context
+                              .read<TabbedPageViewModel>()
+                              .switchToPage(MainPage.treePage, context);
+                          context.read<TreePageViewModel>().setPlotId(plot.id!);
+                        },
+                        buttonPrompt: "VIEW TREE INFO"),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      GestureDetector(
+                          onTap: () {},
+                          child: const Icon(
+                            Icons.edit,
+                          )),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            onDelete(plot);
+                            context.read<TreePageViewModel>().setPlotId(null);
+                          },
+                          child: const Icon(
+                            Icons.delete_forever_outlined,
+                            color: AppColors.alertRed,
+                          ))
+                    ]),
+                  ],
                 ),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  GestureDetector(
-                      onTap: () {
-                        onDelete(plot);
-                      },
-                      child: const Icon(
-                        Icons.delete_forever_outlined,
-                        color: AppColors.alertRed,
-                      ))
-                ]),
               ],
             )));
   }

@@ -23,7 +23,7 @@ class PositionVerifier extends StatelessWidget {
         .height;
 
     return Stack(children: [
-      // area that shows the range of the accepted pose
+      /// area that shows the range of the accepted pose
       Positioned(left: width / 2 - rangeRadius / 2,
           top: height / 2 - rangeRadius / 2,
           child: Container(
@@ -54,7 +54,7 @@ class PositionVerifier extends StatelessWidget {
           )
       ),
       if (accelerometerValues != null)
-        // pose indicator
+        /// pose indicator
         Positioned(
           left: width / 2 + accelerometerValues![1] * 20 - indicatorRadius / 2,
           top: height / 2 - accelerometerValues![2] * 20 - indicatorRadius / 2,
@@ -68,7 +68,7 @@ class PositionVerifier extends StatelessWidget {
           ),
         ),
       if (!inGoodRange)
-        // message when not in good pose
+        /// message when not in good pose
         Align(
             alignment: Alignment.bottomCenter,
             child: Container(

@@ -137,6 +137,10 @@ class Database extends _$Database {
     await dbQuery.delete(treeTable, treeToDb(t));
   }
 
+  Future<void> deleteTreeById(int id) async {
+    await dbQuery.deleteWhere(treeTable, (t) => t.id.equals(id));
+  }
+
   Future<void> deletePlotList(List<Plot> plots) async {
     await dbQuery.deleteBatch(plotTable, plots.map((p) => plotToDb(p)).toList());
   }

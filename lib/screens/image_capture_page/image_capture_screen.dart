@@ -106,9 +106,6 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
         body: WillPopScope(
       onWillPop: () async {
@@ -281,5 +278,20 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
         ),
       );
     }
+
+    /// for depthImg evaluation
+    /*final evaluateResult = await DepthEvaluator().evaluateDepth(imageRaw);
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) =>
+              Scaffold(
+                body: Center(
+                  child: Text(evaluateResult),
+                ),
+        ),
+      ));
+    }*/
   }
 }

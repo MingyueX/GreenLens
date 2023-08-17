@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tree/img_result_provider.dart';
-import 'package:tree/model/models.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
+import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
 import 'package:tree/services/storage/db_service.dart';
 import 'dart:io';
 
@@ -22,21 +22,6 @@ void main() async {
 
   final dbService = DatabaseService();
   await dbService.clear();
-
-  Farmer farmer = Farmer(name: "Miranda", participantId: 1);
-
-  Plot plot = Plot(
-      farmerId: 1,
-      clusterId: 1,
-      groupId: 1,
-      farmId: 1,
-      date: DateTime.now(),
-      harvesting: false,
-      thinning: false,
-      dominantLandUse: LandUse.bare.name);
-
-  await dbService.insertFarmer(farmer);
-  await dbService.insertPlot(plot);
 
   final appDocDir = await getApplicationDocumentsDirectory();
   final file = File('${appDocDir.path}/map_pin.glb');
@@ -55,5 +40,6 @@ void main() async {
       ],
       child: MultiBlocProvider(providers: [
         BlocProvider<PlotPageViewModel>(create: (_) => PlotPageViewModel()),
+        BlocProvider<TreePageViewModel>(create: (_) => TreePageViewModel()),
       ], child: const MyApp())));
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tree/base/widgets/plain_button.dart';
-import 'package:tree/screens/plot_page/plot_collect_page.dart';
 
 import '../../base/widgets/confirm_button.dart';
 import '../../base/widgets/gradient_bg.dart';
+import '../plot_collect_page/plot_collect_page.dart';
 
+/// deprecated page, used nowhere for now
 class SetUpPage extends StatelessWidget {
   const SetUpPage({Key? key}) : super(key: key);
 

@@ -71,6 +71,7 @@ android {
                 install "pytorch-lightning==1.5.0"
                 install "urllib3==1.26.16"
                 install "segmentation-models-pytorch==0.3.2"
+                install "opencv-python"
             }
             pyc {
                 src false

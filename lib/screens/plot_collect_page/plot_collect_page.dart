@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:tree/base/widgets/confirm_button.dart';
 import 'package:tree/base/widgets/plain_button.dart';
 import 'package:tree/farmer_provider.dart';
+import 'package:tree/screens/main_pages/plot_page/widget/plot_collect_card.dart';
 import 'package:tree/screens/plot_list_page/collected_plot_list.dart';
-import 'package:tree/screens/plot_page/widget/plot_collect_card.dart';
 
 import '../../base/widgets/gradient_bg.dart';
 
+/// deprecated page, used nowhere for now
 class PlotWidget {
   bool isExpanded;
   PlotCollectCard plotCard;

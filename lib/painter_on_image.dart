@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:ui';
 import 'package:ar_flutter_plugin/models/camera_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -27,6 +27,7 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
   int _strokeDrawn = 0;
   GlobalKey repaintBoundaryKey = GlobalKey();
 
+  /// for dragging, not used yet
   bool _insidePath(double x, double y, Path path, Offset offset) {
     return path.getBounds().contains(Offset(x - offset.dx, y - offset.dy));
   }
@@ -42,23 +43,31 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
     });
   }
 
-  Future<void> _saveAsImage(double ratio) async {
+  double _averageXCoordinateOfPath(Path path) {
+    List<Offset> points = [];
+    for (PathMetric metric in path.computeMetrics()) {
+      for (double t = 0; t <= 1.0; t += 0.01) {
+        points.add(metric.getTangentForOffset(metric.length * t)!.position);
+      }
+    }
+    return points.map((e) => e.dx).reduce((a, b) => a + b) / points.length;
+  }
+
+  Future<Uint8List> _saveSingleStrokeAsImage(Path path, Offset offset, double ratio) async {
     // Create a boundary with the key of the widget that contains the image and path
     RenderRepaintBoundary boundary = repaintBoundaryKey.currentContext!
         .findRenderObject() as RenderRepaintBoundary;
-
-    /*final image = await boundary.toImage(
-      pixelRatio: 1 / ratio,
-    );*/
 
     // paint the path with width 1px for saving
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(
         recorder,
-        Rect.fromPoints(Offset(0, 0), Offset(boundary.size.width, boundary.size.height))
+        Rect.fromPoints(
+            Offset(0, 0), Offset(boundary.size.width, boundary.size.height))
     );
 
-    final painter = MultiplePathPainter(path1, path2, offset1, offset2, width: 1.0);
+    final painter = PathPainter(
+        path, offset, width: 1.0);
 
     painter.paint(canvas, boundary.size);
 
@@ -69,20 +78,35 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
     );
 
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    final rgbaBytes = byteData!.buffer.asUint8List();
-    String base64String = base64Encode(rgbaBytes);
+    final pngBytes = byteData!.buffer.asUint8List();
 
-    /*final Directory directory = await getApplicationDocumentsDirectory();
-    final File file = File('${directory.path}/my_file.txt');
-    await file.writeAsString(base64String);
+    return pngBytes;
+  }
 
-    print(base64String);*/
+  Future<void> _saveAsImage(double ratio) async {
+    Path leftPath, rightPath;
+    Offset leftOffset, rightOffset;
+
+    if (_averageXCoordinateOfPath(path1) < _averageXCoordinateOfPath(path2)) {
+      leftPath = path1;
+      rightPath = path2;
+      leftOffset = offset1;
+      rightOffset = offset2;
+    } else {
+      leftPath = path2;
+      rightPath = path1;
+      leftOffset = offset2;
+      rightOffset = offset1;
+    }
+
+    final leftBytes = await _saveSingleStrokeAsImage(leftPath, leftOffset, ratio);
+    final rightBytes = await _saveSingleStrokeAsImage(rightPath, rightOffset, ratio);
 
     if (context.mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ImageDisplayScreen(imageBytes: rgbaBytes),
+          builder: (context) => ImageDisplayScreen(imageBytesLeft: leftBytes, imageBytesRight: rightBytes,),
         ),
       );
     }
@@ -147,22 +171,10 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
                   });
                 }
               },
-              child: /*RepaintBoundary(
-                key: repaintBoundaryKey,
-                child: */
+              child:
                 RepaintBoundary(
                   key: repaintBoundaryKey,
                   child:
-                  /*Container(
-                    width: scaledWidth,
-                    height: scaledHeight,
-                    child: ClipRect(
-                      child: CustomPaint(
-                        painter: PathPainter(path, offset, width: 1.0),
-                        child: Container(),
-                      ),
-                    ),
-                  ),),*/
                   Container(
                   width: scaledWidth,
                   height: scaledHeight,
@@ -208,7 +220,7 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
   }
 }
 
-/*class PathPainter extends CustomPainter {
+class PathPainter extends CustomPainter {
   PathPainter(this.path, this.offset, {this.width = 5.0});
 
   final Path path;
@@ -226,7 +238,7 @@ class _DraggableImagePainterState extends State<DraggableImagePainter> {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}*/
+}
 
 class MultiplePathPainter extends CustomPainter {
   MultiplePathPainter(this.path1, this.path2, this.offset1, this.offset2, {this.width = 5.0});
@@ -250,20 +262,69 @@ class MultiplePathPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-class ImageDisplayScreen extends StatelessWidget {
-  final Uint8List imageBytes;
+class ImageDisplayScreen extends StatefulWidget {
+  final Uint8List imageBytesLeft;
+  final Uint8List imageBytesRight;
 
-  const ImageDisplayScreen({super.key, required this.imageBytes});
+  const ImageDisplayScreen({
+    Key? key,
+    required this.imageBytesLeft,
+    required this.imageBytesRight,
+  }) : super(key: key);
+
+  @override
+  _ImageDisplayScreenState createState() => _ImageDisplayScreenState();
+}
+
+class _ImageDisplayScreenState extends State<ImageDisplayScreen> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPage);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Container(
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 1.0)),
-            child: Image.memory(imageBytes)),
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (page) {
+            setState(() {
+              _currentPage = page;
+            });
+          },
+          children: [
+            _buildImage(widget.imageBytesLeft),
+            _buildImage(widget.imageBytesRight),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (_currentPage == 0) {
+            _pageController.animateToPage(1,
+                duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          } else {
+            _pageController.animateToPage(0,
+                duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          }
+        },
+        child: Icon(Icons.swap_horiz),
       ),
     );
   }
+
+  Widget _buildImage(Uint8List imageBytes) {
+    return Center(
+    child:
+      Container(
+      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 1.0)),
+      child: Image.memory(imageBytes),
+    ));
+  }
 }
+

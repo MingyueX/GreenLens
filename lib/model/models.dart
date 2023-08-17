@@ -162,3 +162,59 @@ enum TreeAliveCondition {
     );
   }
 }
+
+enum PhysicalMechanism {
+  standing("Standing", "a"),
+  broken("Broken (snapped trunk)", "b"),
+  uprooted("Uprooted (root tip-up)", "c"),
+  probablyStanding("Standing or broken, probably standing (not uprooted)", "d"),
+  probablyBroken("Standing or broken, probably broken (not uprooted)", "e"),
+  notUprooted("Standing or broken (not uprooted)", "f"),
+  probablyUprooted("Broken or uprooted, probably uprooted", "g"),
+  probablyBrokenUprooted("Broken or uprooted, probably broken", "h"),
+  notStanding("Broken or uprooted (not standing)", "i"),
+  vanished("Vanished (found location, tree looked for but not found)", "k"),
+  presumedDead("Presumed dead (location of tree not found e.g. problems, poor maps, etc.)", "l"),
+  unknown("Unknown", "m");
+
+  final String detail;
+  final String statusCode;
+
+  const PhysicalMechanism(this.detail, this.statusCode);
+}
+
+enum NumTreesInMortality {
+  diedAlone("Died alone", "p"),
+  oneOfMultipleDeaths("One of multiple deaths", "q"),
+  unknown("Unknown", "r");
+
+  final String detail;
+  final String statusCode;
+
+  const NumTreesInMortality(this.detail, this.statusCode);
+}
+
+enum KillProcess {
+  anthropogenic("Anthropogenic", "j"),
+  burnt("Burnt", "n"),
+  lightning("Lightning", "o"),
+  unknownKilled("Unknown whether killed or killed", "s"),
+  killer("Killer of at least one other tree >10cm DBH", "t"),
+  killedNoMoreInfo("Killed, no more information", "u"),
+  killedBroken("Killed by tree that died broken", "v"),
+  killedUprooted("Killed by another tree that uprooted", "w"),
+  killedBranchesDead("Killed by branches from dead standing tree", "x"),
+  killedBranchesLiving("Killed by branches fallen from living tree", "y"),
+  killedStrangler("Killed by strangler", "z"),
+  killedLiana("Killed by liana", "2"),
+  killedWeight("Killed by strangler / liana weight [tree died broken or fallen]", "3"),
+  killedCompetition("Killed by strangler / liana competition [tree died standing]", "4"),
+  killedElephant("Killed by elephant", "5"),
+  killedTermites("Killed by termites", "6"),
+  killedWind("Killed by wind", "7");
+
+  final String detail;
+  final String statusCode;
+
+  const KillProcess(this.detail, this.statusCode);
+}

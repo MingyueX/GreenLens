@@ -13,4 +13,6 @@ class AppColors {
 
   static const gradientBgTop = Color(0x4CCCE59D);
   static const gradientBgBottom = Color(0x00CCE59D);
+
+  static const lightBackground = Color(0xFFF6FBEE);
 }

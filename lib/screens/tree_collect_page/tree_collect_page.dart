@@ -1,11 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:tree/screens/tree_collect_page/widget/tree_collect_card.dart';
+import 'package:tree/screens/main_pages/tree_page/widget/tree_collect_card.dart';
 
 import '../../base/widgets/confirm_button.dart';
 import '../../base/widgets/gradient_bg.dart';
 import '../../base/widgets/plain_button.dart';
 
+/// deprecated page, used nowhere for now
 class TreeWidget {
   bool isExpanded;
   TreeCollectCard treeCard;

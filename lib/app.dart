@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:tree/constant.dart';
 import 'package:tree/screens/splash_screen/splash_screen.dart';
 import 'theme/themes.dart';
 
@@ -13,9 +14,10 @@ class MyApp extends StatelessWidget {
         builder: (context) => PlatformTheme(
             themeMode: ThemeMode.light,
             materialLightTheme: Themes.lightTheme,
-            builder: (context) => const PlatformApp(
+            builder: (context) => PlatformApp(
+              navigatorKey: AppConstants.navigatorKey,
               title: 'Flutter Demo',
-              home: SplashScreen(),
+              home: const SplashScreen(),
             )));
   }
 }

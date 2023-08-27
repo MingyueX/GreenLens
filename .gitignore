@@ -1,5 +1,6 @@
 *.ckpt
 *.g.dart
+*.pth
 
 # Miscellaneous
 *.class

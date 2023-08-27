@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:tree/base/widgets/toast_like_msg.dart';
 import 'package:tree/capture_confirmation_screen.dart';
+import 'package:tree/screens/image_capture_page/raw_depth_display_test.dart';
 import 'package:tree/screens/image_capture_page/widget/position_verifier.dart';
 import 'package:tree/theme/colors.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -142,6 +143,8 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
                                 ? ElevatedButton(
                                     onPressed: () async {
                                       _currentStep++;
+                                      _arSessionManager!.onPlaneOrPointTap =
+                                          (list) {};
                                     },
                                     child: const Text("Anchor Placed"),
                                   )
@@ -154,17 +157,18 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
                                       )
                                     : Container())),
             if (_anchor != null)
-            Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                    padding: const EdgeInsets.only(top: 15, left: 15),
-                    child: ToastLikeMsg(
-                        msg: "Elevation: ${elevation?.toStringAsFixed(3) ?? 0.0}",
-                        backgroundColor: AppColors.grey.withOpacity(0.5),
-                        textStyle:
-                            Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  color: AppColors.baseBlack,
-                                )))),
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                      padding: const EdgeInsets.only(top: 15, left: 15),
+                      child: ToastLikeMsg(
+                          msg:
+                              "Elevation: ${elevation?.toStringAsFixed(3) ?? 0.0}",
+                          backgroundColor: AppColors.grey.withOpacity(0.5),
+                          textStyle:
+                              Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    color: AppColors.baseBlack,
+                                  )))),
             if (_currentStep == 2)
               PositionVerifier(
                 inGoodRange: _inGoodRange,
@@ -271,11 +275,24 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
     }
 
     if (mounted && imageResult != null) {
+      print("rgbbytes: ${imgRGB.bytes!}");
+      print("depthbytes: ${arImage.depthImgBytes!}");
+      print("rawdepthbytes: ${arImage.rawDepthImgBytes!}");
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) =>
-              CaptureConfirm(imageResult: imageResult!, cameraImage: imgRGB),
-        ),
+            builder: (context) => CaptureConfirm(
+                imageResult: imageResult!,
+                cameraImage: imgRGB,
+                captureHeight: elevation!,
+                rawDepthArrays: arImage.rawDepthImgArrays,
+                confidenceArrays: arImage.confidenceImgArrays)),
+        /*RawDepthTest(
+                    cameraImg: imgRGB.bytes!,
+                    depthImg: arImage.depthImgBytes!,
+                    rawDepthImg: arImage.rawDepthImgBytes!,
+                    confidenceImg: arImage.confidenceImgBytes!,
+                    width: arImage.width!,
+                    height: arImage.height!)),*/
       );
     }
 

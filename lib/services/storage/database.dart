@@ -52,9 +52,21 @@ class Database extends _$Database {
     await dbQuery.insertBatch(treeTable, trees.map((t) => treeToDb(t)).toList(), null);
   }
 
+  Future<Farmer?> searchFarmer(int id) async {
+    final farmer = await dbQuery.select(farmerTable, (f) => f.id.equals(id));
+    if (farmer == null) {
+      return null;
+    }
+
+    return Future.sync(() => farmerFromDb(farmer as FarmerTableData));
+  }
+
   // search functions for plot
   Future<Plot?> searchPlotById(int id) async {
     final plot = await dbQuery.select(plotTable, (p) => p.id.equals(id));
+    if (plot == null) {
+      return null;
+    }
 
     return Future.sync(() => plotFromDb(plot as PlotTableData));
   }
@@ -78,8 +90,11 @@ class Database extends _$Database {
   }
 
   // search functions for tree
-  Future<Tree> searchTreeById(int id) async {
+  Future<Tree?> searchTreeById(int id) async {
     final tree = await dbQuery.select(treeTable, (t) => t.id.equals(id));
+    if (tree == null) {
+      return null;
+    }
 
     return Future.sync(() => treeFromDb(tree as TreeTableData));
   }

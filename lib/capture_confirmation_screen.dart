@@ -1,5 +1,5 @@
-import 'package:ar_flutter_plugin/models/ar_image.dart';
 import 'package:ar_flutter_plugin/models/camera_image.dart';
+import 'package:ar_flutter_plugin/models/depth_img_array.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +7,7 @@ import 'package:tree/screens/image_capture_page/image_capture_screen.dart';
 import 'package:tree/image_processor_interface.dart';
 import 'package:tree/img_result_provider.dart';
 import 'package:tree/painter_on_image.dart';
+import 'package:tree/utils/file_storage.dart';
 import 'package:tree/utils/image_util.dart';
 import 'dart:ui' as ui;
 
@@ -14,11 +15,17 @@ class CaptureConfirm extends StatelessWidget {
   const CaptureConfirm(
       {Key? key,
       required this.imageResult,
-      required this.cameraImage})
+      required this.cameraImage,
+      required this.captureHeight,
+      required this.rawDepthArrays,
+      required this.confidenceArrays})
       : super(key: key);
 
   final ImageResult imageResult;
   final CameraImage cameraImage;
+  final double captureHeight;
+  final DepthImgArrays? rawDepthArrays;
+  final DepthImgArrays? confidenceArrays;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +62,7 @@ class CaptureConfirm extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () async {
                       ui.Image image =
-                          await ImageUtil.cameraImageToUiImage(cameraImage);
+                          await ImageUtil.bytesToUiImage(cameraImage.bytes!);
                       if (context.mounted) {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -76,7 +83,14 @@ class CaptureConfirm extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: () {
-                    Provider.of<ImgResultProvider>(context, listen: false).imageResult = imageResult;
+                    Provider.of<ImgResultProvider>(context, listen: false)
+                        .imageResult = imageResult;
+                    FileStorage.saveToFileResults(
+                        elevation: captureHeight,
+                        image: cameraImage.bytes!,
+                        arrays: imageResult.depthImage!,
+                        rawDepthArrays: rawDepthArrays,
+                        confidenceArrays: confidenceArrays);
                     Navigator.of(context).maybePop();
                   },
                   child: const Text("Save"),

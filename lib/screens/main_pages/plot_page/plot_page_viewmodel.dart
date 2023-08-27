@@ -14,6 +14,15 @@ class PlotPageViewModel extends Cubit<PlotsState> {
 
   final dbService = DatabaseService();
 
+  setFarmer(int? farmerId) async {
+    if (farmerId == null) {
+      emit(PlotsState([]));
+      return;
+    }
+    List<Plot> updatedPlots = await dbService.searchPlotByFarmerId(farmerId);
+    emit(PlotsState(updatedPlots));
+  }
+
   Future<void> addPlot(Plot plot) async {
     await dbService.insertPlot(plot);
     List<Plot> updatedPlots = await dbService.searchPlotByFarmerId(plot.farmerId);

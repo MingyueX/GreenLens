@@ -49,13 +49,18 @@ dependencies:
   permission_handler: ^10.4.3
   provider: ^6.0.5
   sensors_plus: ^3.0.3
-  google_maps_flutter: ^2.4.0
+  shared_preferences: ^2.2.0
+  image: ^3.0.0
+  firebase_core: ^2.15.1
+  latlong2: ^0.8.0
   collection:
 
   ar_flutter_plugin:
     git:
       url: https://github.com/MingyueX/ar_flutter_plugin.git
-      ref: ar-image
+      ref: raw-depth
+  flutter_map_tile_caching: ^8.0.1
+  flutter_map: ^4.0.0
 
 dev_dependencies:
   flutter_test:

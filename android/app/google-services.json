@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "116966177185",
+    "project_id": "greenlens-1",
+    "storage_bucket": "greenlens-1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116966177185:android:bf989aa469bc7ea23b73e0",
+        "android_client_info": {
+          "package_name": "com.example.tree"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "116966177185-glgo5javtmbmtvmhcb64bo9vmae23fqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDbDI61qKzU8IHV2w7LrI-I_SMtLQPNrQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "116966177185-glgo5javtmbmtvmhcb64bo9vmae23fqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

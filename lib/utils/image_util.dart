@@ -15,11 +15,11 @@ class ImageUtil {
     return completer.future;
   }
 
-  static Future<ui.Image> cameraImageToUiImage(CameraImage cameraImage) async {
+  static Future<ui.Image> bytesToUiImage(Uint8List bytes) async {
     final Completer<ui.Image> completer = Completer();
 
     ui.decodeImageFromList(
-      cameraImage.bytes!,
+      bytes,
       (ui.Image img) {
         completer.complete(img);
       },

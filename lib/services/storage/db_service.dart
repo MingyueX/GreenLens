@@ -15,6 +15,8 @@ class DatabaseService {
 
   Future<void> insertAllTree(List<Tree> trees) => db.insertAllTree(trees);
 
+  Future<Farmer?> searchFarmer(int id) => db.searchFarmer(id);
+
   Future<Plot?> searchPlotById(int id) => db.searchPlotById(id);
 
   Future<List<Plot>> searchPlotByFarmerId(int id) => db.searchPlotByFarmerId(id);

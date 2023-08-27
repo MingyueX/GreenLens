@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tree/base/custom_route.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
 import 'package:tree/screens/main_pages/tree_page/widget/plot_list.dart';
+import 'package:tree/screens/map_downloader/map_downloader.dart';
 import 'package:tree/screens/page_navigation/page_nav_viewmodel.dart';
 import 'package:tree/theme/themes.dart';
 
 import '../../../theme/colors.dart';
+import '../../base/widgets/shortcut_to_capture.dart';
 import '../main_pages/plot_page/new_plot_collection.dart';
 import '../main_pages/tree_page/new_tree_collection.dart';
 import '../main_pages/tree_page/tree_page_viewmodel.dart';
@@ -60,6 +62,7 @@ class _TabbedPageState extends State<TabbedPage>
           _tabController.animateTo(index); // Update the tab controller's index.
         }
         return Scaffold(
+          floatingActionButton: const ShortCutButton(),
           backgroundColor: AppColors.baseWhite,
           body: IndexedStack(
               index: MainPage.values.indexOf(state.currentPage),
@@ -134,7 +137,19 @@ class _TabbedPageState extends State<TabbedPage>
                               icon: const Icon(
                                 Icons.add,
                                 color: AppColors.baseWhite,
-                              )))
+                              ))),
+                    if (state.currentPage == MainPage.mapPage)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 20, right: 10),
+                          child: IconButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => const DownloaderPage()));
+                              },
+                              icon: const Icon(
+                                Icons.download,
+                                color: AppColors.baseWhite,
+                              ))),
                   ],
                   automaticallyImplyLeading: false,
                   backgroundColor: AppColors.primaryGreen,

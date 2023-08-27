@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:tree/screens/main_pages/map_page/map_page.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page.dart';
 import 'package:tree/screens/main_pages/profile_page/profile_page.dart';
 import 'package:tree/theme/colors.dart';
@@ -27,7 +28,7 @@ class TabbedPageViewModel extends Cubit<TabbedPageState> {
       const ProfilePage(),
       const PlotPage(),
       const TreePage(),
-      Container(color: AppColors.lightBackground,)
+      const MapPage()
     ];
 
     tabs = {

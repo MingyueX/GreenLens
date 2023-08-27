@@ -3,7 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  firebase_core
   geolocator_windows
+  isar_flutter_libs
   permission_handler_windows
   sqlite3_flutter_libs
 )

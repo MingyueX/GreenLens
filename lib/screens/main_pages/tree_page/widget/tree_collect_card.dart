@@ -8,6 +8,7 @@ import 'package:tree/base/widgets/check_box.dart';
 import 'package:tree/base/widgets/confirm_button.dart';
 import 'package:tree/screens/image_capture_page/image_capture_screen.dart';
 import 'package:tree/theme/colors.dart';
+import 'package:tree/utils/location.dart';
 
 import '../../../../img_result_provider.dart';
 import '../../../../model/models.dart';
@@ -48,24 +49,14 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
   }
 
   _getLocation() async {
-    PermissionStatus status = await Permission.locationWhenInUse.status;
-
-    if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
-      // Request permission
-      status = await Permission.locationWhenInUse.request();
-    }
-
-    if (status.isGranted) {
-      final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+    LocationUtil.getLocation().then((value) {
+      if (value == null) return;
+      // TODO: handle null value (when user deny location permission)
       setState(() {
-        _latController.text = position.latitude.toStringAsFixed(2);
-        _longController.text = position.longitude.toStringAsFixed(2);
+        _latController.text = value.latitude.toStringAsFixed(2);
+        _longController.text = value.longitude.toStringAsFixed(2);
       });
-    } else {
-      // TODO: Handle the case when permission is not granted
-      print('Location permission not granted');
-    }
+    });
   }
 
   @override

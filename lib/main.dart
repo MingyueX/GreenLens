@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:tree/img_result_provider.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
 import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
+import 'package:tree/utils/camera.dart';
 import 'dart:io';
 
 import 'app.dart';
@@ -23,6 +25,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final cameras = await availableCameras();
+  CameraUtil.camera = cameras.first;
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

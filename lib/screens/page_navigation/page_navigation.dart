@@ -1,18 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tree/base/custom_route.dart';
-import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
-import 'package:tree/screens/main_pages/tree_page/widget/plot_list.dart';
-import 'package:tree/screens/map_downloader/map_downloader.dart';
 import 'package:tree/screens/page_navigation/page_nav_viewmodel.dart';
-import 'package:tree/theme/themes.dart';
 
 import '../../../theme/colors.dart';
 import '../../base/widgets/shortcut_to_capture.dart';
-import '../main_pages/plot_page/new_plot_collection.dart';
-import '../main_pages/tree_page/new_tree_collection.dart';
-import '../main_pages/tree_page/tree_page_viewmodel.dart';
 
 class TabbedPage extends StatefulWidget {
   const TabbedPage({super.key});
@@ -51,8 +43,6 @@ class _TabbedPageState extends State<TabbedPage>
 
   @override
   Widget build(BuildContext context) {
-    int? currentPlot = context.watch<TreePageViewModel>().state.plotId;
-
     return BlocProvider<TabbedPageViewModel>(
       create: (_) => _viewModel,
       child: BlocBuilder<TabbedPageViewModel, TabbedPageState>(
@@ -71,99 +61,6 @@ class _TabbedPageState extends State<TabbedPage>
                       onGenerateRoute: (settings) =>
                           MaterialPageRoute(builder: (_) => page)))
                   .toList()),
-          appBar: state.currentPage == MainPage.profilePage
-              ? null
-              : AppBar(
-                  toolbarHeight: 100,
-                  actions: [
-                    if (state.currentPage == MainPage.treePage)
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: SizedBox(
-                              width: 40,
-                              child: IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        CustomRoute(
-                                            builder: (_) =>
-                                                const PlotListOptions()));
-                                  },
-                                  icon: const Icon(
-                                    Icons.list,
-                                    color: AppColors.baseWhite,
-                                  )))),
-                    if (state.currentPage == MainPage.plotPage ||
-                        state.currentPage == MainPage.treePage)
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20, right: 10),
-                          child: IconButton(
-                              onPressed: () {
-                                if (state.currentPage == MainPage.plotPage) {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .push(MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AddPlotPage()));
-                                } else if (state.currentPage ==
-                                    MainPage.treePage) {
-                                  if (context
-                                      .read<PlotPageViewModel>()
-                                      .state
-                                      .plots
-                                      .isEmpty) {
-                                    SnackBar snackBar = const SnackBar(
-                                      content: Text('Please add a plot first'),
-                                      duration: Duration(seconds: 1),
-                                    );
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  } else if (currentPlot == null) {
-                                    // TODO: display available plots
-                                    SnackBar snackBar = const SnackBar(
-                                      content:
-                                          Text('Please select a plot first'),
-                                      duration: Duration(seconds: 1),
-                                    );
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
-                                  } else {
-                                    Navigator.of(context, rootNavigator: true)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AddTreePage()));
-                                  }
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.add,
-                                color: AppColors.baseWhite,
-                              ))),
-                    if (state.currentPage == MainPage.mapPage)
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20, right: 10),
-                          child: IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const DownloaderPage()));
-                              },
-                              icon: const Icon(
-                                Icons.download,
-                                color: AppColors.baseWhite,
-                              ))),
-                  ],
-                  automaticallyImplyLeading: false,
-                  backgroundColor: AppColors.primaryGreen,
-                  title: Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 20),
-                    child: Text(
-                      state.currentPage == MainPage.plotPage
-                          ? 'Plots'
-                          : state.currentPage == MainPage.mapPage
-                              ? "Maps"
-                              : "Trees - ${currentPlot == null ? 'No plot selected' : 'Plot#$currentPlot'}",
-                      style: Theme.of(context).textTheme.appbarTitle,
-                    ),
-                  )),
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(color: AppColors.primaryGreen),
             child: TabBar(

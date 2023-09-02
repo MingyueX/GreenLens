@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:tree/screens/map_downloader/widgets/cached_map.dart';
 import 'package:tree/screens/map_downloader/widgets/map_view.dart';
@@ -14,20 +15,22 @@ import '../../constant.dart';
 import '../../map/map_download_provider.dart';
 
 class DownloaderPage extends StatefulWidget {
-  const DownloaderPage({super.key});
+  const DownloaderPage({super.key, required this.initialCenter});
+
+  final LatLng initialCenter;
 
   @override
   State<DownloaderPage> createState() => _DownloaderPageState();
 }
 
 class _DownloaderPageState extends State<DownloaderPage> {
-  late StreamSubscription<DownloadProgress> _progressListener;
+  StreamSubscription<DownloadProgress>? _progressListener;
   double _downloadProgress = 0;
   bool _downloading = false;
 
   @override
   void dispose() {
-    _progressListener.cancel();
+    _progressListener?.cancel();
     super.dispose();
   }
 
@@ -44,7 +47,7 @@ class _DownloaderPageState extends State<DownloaderPage> {
                 style: Theme.of(context).textTheme.appbarTitle),
           ),
         ),
-        body: Center(child: MapView()),
+        body: Center(child: MapView(initialCenter: widget.initialCenter,)),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showModalBottomSheet(

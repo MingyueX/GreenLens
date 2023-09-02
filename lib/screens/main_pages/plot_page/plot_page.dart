@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:tree/base/widgets/app_bar.dart';
 import 'package:tree/base/widgets/plain_button.dart';
 import 'package:tree/screens/main_pages/plot_page/new_plot_collection.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
@@ -20,38 +21,48 @@ class PlotPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<PlotPageViewModel>();
 
-    return Container(
-        color: AppColors.lightBackground,
-        child:
-      BlocBuilder<PlotPageViewModel, PlotsState>(
-        builder: (context, state) {
-      if (state.plots.isEmpty) {
-        return Center(
-            child: PlainButton(
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                          builder: (context) => const AddPlotPage()));
-                },
-                buttonPrompt: "+ ADD PLOT"));
-      } else {
-        return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            height: 580,
-            child: ListView.separated(
-              itemCount: state.plots.length,
-              itemBuilder: (BuildContext context, int index) {
-                return PlotItem(
-                  plot: state.plots[index],
-                  onDelete: (plot) => viewModel.removePlot(plot),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(height: 5);
-              },
-            ));
-      }
-    }));
+    return Scaffold(
+        appBar: CustomAppBar(
+          title: 'Plots',
+          actions: {
+            Icons.add: () {
+              Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const AddPlotPage()));
+            }
+          },
+        ),
+        body: Container(
+            color: AppColors.lightBackground,
+            child: BlocBuilder<PlotPageViewModel, PlotsState>(
+                builder: (context, state) {
+              if (state.plots.isEmpty) {
+                return Center(
+                    child: PlainButton(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                  builder: (context) => const AddPlotPage()));
+                        },
+                        buttonPrompt: "+ ADD PLOT"));
+              } else {
+                return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    height: 580,
+                    child: ListView.separated(
+                      itemCount: state.plots.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return PlotItem(
+                          plot: state.plots[index],
+                          onDelete: (plot) => viewModel.removePlot(plot),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(height: 5);
+                      },
+                    ));
+              }
+            })));
   }
 }
 

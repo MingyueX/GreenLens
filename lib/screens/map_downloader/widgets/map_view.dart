@@ -12,8 +12,10 @@ import '../../../map/region_mode.dart';
 
 class MapView extends StatefulWidget {
   const MapView({
-    super.key,
+    super.key, required this.initialCenter,
   });
+
+  final LatLng initialCenter;
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -89,7 +91,7 @@ class _MapViewState extends State<MapView> {
                   FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      center: LatLng(43.663250, -79.383610),
+                      center: widget.initialCenter,
                       zoom: 15,
                       maxZoom: 22,
                       maxBounds: LatLngBounds.fromPoints([

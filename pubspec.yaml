@@ -53,6 +53,8 @@ dependencies:
   image: ^3.0.0
   firebase_core: ^2.15.1
   latlong2: ^0.8.0
+  camera: ^0.10.5+4
+  http: ^0.13.5
   collection:
 
   ar_flutter_plugin:

@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tree/base/widgets/app_bar.dart';
 import 'package:tree/constant.dart';
+import 'package:tree/theme/themes.dart';
 
+import '../../../theme/colors.dart';
 import '../../../utils/location.dart';
+import '../../map_downloader/map_downloader.dart';
 
 // TODO: handle the case when location permission is not granted
 class MapPage extends StatefulWidget {
@@ -19,12 +23,22 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   StreamSubscription<Position>? positionStream;
   Position? _currentPosition;
+  final mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
-    return _currentPosition == null
+    return Scaffold(
+      appBar:
+          CustomAppBar(title: 'Maps', actions: {Icons.download: () {
+            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                builder: (context) => DownloaderPage(initialCenter: mapController.center,)));
+          }
+          }),
+      body:
+      _currentPosition == null
         ? const Center(child: CircularProgressIndicator())
         : FlutterMap(
+            mapController: mapController,
             options: MapOptions(
               center: LatLng(
                   _currentPosition!.latitude, _currentPosition!.longitude),
@@ -61,7 +75,7 @@ class _MapPageState extends State<MapPage> {
                 ],
               ),
             ],
-          );
+          ));
     /*MapboxMap(
       myLocationEnabled: true,
       styleString: "mapbox://styles/mira0221/clloq8gfs00cu01qx2ee5elc5",

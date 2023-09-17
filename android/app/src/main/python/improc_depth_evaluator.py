@@ -10,10 +10,12 @@ sys.path.append('./src')
 from src.imageprocessor import *
 
 def run(depth_arr, rgb_arr, rgb_width, rgb_height, depth_width, depth_height):
-    
+
+    depth_arr_array = depth_arr.toArray()
+    depth_arr_list = list(depth_arr_array)
     # Read depth image and resize as if we were going to call processor.py
     TOF_SHAPE = (depth_height, depth_width)
-    depth = np.array(depth_arr, dtype=np.float64).reshape(TOF_SHAPE)
+    depth = np.array(depth_arr_list, dtype=np.float64).reshape(TOF_SHAPE)
     ### convert the depth image to 360x480
     new_height = 360
     new_width = 480

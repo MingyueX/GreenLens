@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 
 abstract class ImageProcessorInterface {
 
-  Future<ImageResult> processImage(BuildContext context, ImageRaw raw);
+  Future<Map<String, dynamic>> processImage(BuildContext context, ImageRaw raw);
 
 }
 
 class ImageResult {
-  ui.Image? displayImage;
+  Image? displayImage;
   Uint8List? rgbImage;
   DepthImgArrays? depthImage;
   double diameter;

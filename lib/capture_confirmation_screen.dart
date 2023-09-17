@@ -18,7 +18,8 @@ class CaptureConfirm extends StatelessWidget {
       required this.cameraImage,
       required this.captureHeight,
       required this.rawDepthArrays,
-      required this.confidenceArrays})
+      required this.confidenceArrays,
+      required this.diameter})
       : super(key: key);
 
   final ImageResult imageResult;
@@ -26,6 +27,7 @@ class CaptureConfirm extends StatelessWidget {
   final double captureHeight;
   final DepthImgArrays? rawDepthArrays;
   final DepthImgArrays? confidenceArrays;
+  final double diameter;
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +43,17 @@ class CaptureConfirm extends StatelessWidget {
           children: [
             Center(
               child: imageResult.displayImage != null
-                  ? RawImage(
-                      image: imageResult.displayImage!,
-                    )
+                  ? imageResult.displayImage!
+                  // ? RawImage(
+                  //     image: imageResult.displayImage!,
+                  //   )
                   : const Text("No images"),
             ),
             Align(
                 alignment: Alignment.centerLeft,
-                child: Column(children: [
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(
@@ -78,6 +83,10 @@ class CaptureConfirm extends StatelessWidget {
                     },
                     child: const Text("Optimize"),
                   ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text("DBH: ${diameter.toStringAsFixed(2)}",
+                          style: Theme.of(context).textTheme.labelLarge)),
                 ])),
             Align(
                 alignment: Alignment.centerRight,

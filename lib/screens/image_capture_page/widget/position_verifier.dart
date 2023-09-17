@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../theme/colors.dart';
 
 class PositionVerifier extends StatelessWidget {
-  const PositionVerifier({Key? key, required this.inGoodRange, this.accelerometerValues}) : super(key: key);
+  const PositionVerifier({Key? key, required this.inGoodRange, this.accelerometerValues, required this.qualityValue}) : super(key: key);
 
+  final double qualityValue;
   final bool inGoodRange;
   final List<double>? accelerometerValues;
 
@@ -22,29 +23,39 @@ class PositionVerifier extends StatelessWidget {
         .size
         .height;
 
+    Color boxColor = qualityValue < 0.5
+        ? AppColors.lightRed
+        : qualityValue >= 0.75 ? AppColors
+        .lightGreen : AppColors
+        .lightBlue;
+
     return Stack(children: [
-      /// area that shows the range of the accepted pose
+      /// area that shows the range of the accepted pose && used to apply HSV algo
       Positioned(left: width / 2 - rangeRadius / 2,
           top: height / 2 - rangeRadius / 2,
           child: Container(
             width: rangeRadius,
             height: rangeRadius,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              shape: BoxShape.rectangle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.lightBlue.withOpacity(0.3),
-                  AppColors.lightBlue.withOpacity(0.5),
-                  AppColors.lightBlue.withOpacity(0.7),
+                  boxColor.withOpacity(0.3),
+                  boxColor.withOpacity(0.5),
+                  boxColor.withOpacity(0.7),
                 ],
                 stops: const [0.0, 0.5, 1.0],
                 radius: 1.0,
                 focal: const Alignment(0.1,
                     0.1),
               ),
+              border: Border.all(
+                color: boxColor,
+                width: 3,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.lightBlue.withOpacity(0.3),
+                  color: boxColor.withOpacity(0.3),
                   spreadRadius: 5,
                   blurRadius: 5,
                   offset: const Offset(0, 0),
@@ -53,6 +64,18 @@ class PositionVerifier extends StatelessWidget {
             ),
           )
       ),
+      Align(
+          alignment: Alignment.center,
+          child: Container(
+            margin: const EdgeInsets.only(top: 40),
+            child: Text(
+                qualityValue.toStringAsFixed(2),
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .labelLarge!.copyWith(color: boxColor)
+            ),
+          )),
       if (accelerometerValues != null)
         /// pose indicator
         Positioned(

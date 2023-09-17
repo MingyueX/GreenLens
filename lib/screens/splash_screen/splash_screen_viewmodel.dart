@@ -15,10 +15,9 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
     await Future.delayed(const Duration(seconds: 2));
     emit(DataLoading());
     try {
-      await loadModel();
       final prefs = await SharedPreferences.getInstance();
       final participantID = prefs.getInt("lastFarmer");
-      await Future.delayed(const Duration(seconds: 5));
+      await loadModel();
       if (participantID != null) {
         final farmer = await dbService.searchFarmer(participantID);
         if (farmer == null) {
@@ -40,12 +39,12 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
 
   Future<void> loadModel() async {
     const code = '''
-import model
-
-model.load_model()
+import improc_all
+improc_all.initialize_model()
+print("Model loaded")
   ''';
 
-    final result = await Chaquopy.executeCode(code);
+    final result = await Chaquopy.executeCode(code).timeout(const Duration(minutes: 10));
     print(result);
   }
 }

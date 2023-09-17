@@ -24,9 +24,6 @@ rgb_arr = base64.b64decode("$rgbMatBase64")
 
 dBuffer = np.fromstring("$dBufferStr", sep=',', dtype=np.float64)
 
-print(f'depth_arr shape: {dBuffer.shape}, dtype: {dBuffer.dtype}')
-print(f'rgb_arr length: {len(rgb_arr)}, type: {type(rgb_arr)}')
-
 result = improc_depth_evaluator.run(dBuffer, rgb_arr, ${raw.rgbWidth}, ${raw.rgbHeight}, ${raw.arWidth}, ${raw.arHeight})
 
 print(result)

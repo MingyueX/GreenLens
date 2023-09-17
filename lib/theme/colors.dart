@@ -8,6 +8,8 @@ class AppColors {
   static const alertRed = Color(0xFFCC0000);
   static const safeAreaBlue = Color(0xFF1DA1F2);
   static const lightBlue = Color(0xFFE7FEFF);
+  static const lightGreen = Color(0xFFE7FFEB);
+  static const lightRed = Color(0xFFFFE7E7);
 
   static const grey = Color(0xFF9AA09A);
 

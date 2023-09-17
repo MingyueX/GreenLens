@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  chaquopy: ^0.0.19
+  # chaquopy: ^0.0.19
   drift: ^2.10.0
   sqlite3_flutter_libs: ^0.5.15
   path_provider: ^2.0.15
@@ -61,6 +61,11 @@ dependencies:
     git:
       url: https://github.com/MingyueX/ar_flutter_plugin.git
       ref: raw-depth
+
+  chaquopy:
+    git:
+      url: https://github.com/MingyueX/chaquopy_flutter.git
+      ref: feature/python-return-enhancement
   flutter_map_tile_caching: ^8.0.1
   flutter_map: ^4.0.0
 

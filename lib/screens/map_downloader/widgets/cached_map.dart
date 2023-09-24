@@ -3,7 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../constant.dart';
+import '../../../configs/constant.dart';
 
 class CachedMap extends StatefulWidget {
   const CachedMap({Key? key}) : super(key: key);

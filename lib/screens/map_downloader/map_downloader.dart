@@ -11,7 +11,7 @@ import 'package:tree/screens/map_downloader/widgets/shape_options.dart';
 import 'package:tree/theme/colors.dart';
 import 'package:tree/theme/themes.dart';
 
-import '../../constant.dart';
+import '../../configs/constant.dart';
 import '../../map/map_download_provider.dart';
 
 class DownloaderPage extends StatefulWidget {

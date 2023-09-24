@@ -6,7 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import '../../../constant.dart';
+import '../../../configs/constant.dart';
 import '../../../map/map_download_provider.dart';
 import '../../../map/region_mode.dart';
 

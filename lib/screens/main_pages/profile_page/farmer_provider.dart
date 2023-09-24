@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'model/models.dart';
+import '../../../model/models.dart';
 
 class FarmerProvider extends ChangeNotifier {
   late Farmer _farmer;

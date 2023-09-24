@@ -19,14 +19,14 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:tree/base/widgets/dialog.dart';
 import 'package:tree/base/widgets/toast_like_msg.dart';
-import 'package:tree/capture_confirmation_screen.dart';
+import 'package:tree/screens/image_capture_page/capture_confirmation_screen.dart';
 import 'package:tree/screens/image_capture_page/widget/position_verifier.dart';
 import 'package:tree/theme/colors.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../image_processor.dart';
-import '../../image_processor_interface.dart';
-import '../../painter_on_image.dart';
+import '../../image_processor/image_processor.dart';
+import '../../image_processor/image_processor_interface.dart';
+import 'optimize_paint_on_image.dart';
 import '../../utils/exceptions.dart';
 import '../../utils/image_util.dart';
 

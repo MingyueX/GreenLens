@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tree/base/widgets/app_bar.dart';
 import 'package:tree/screens/main_pages/tree_page/new_tree_collection.dart';
 import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
-import 'package:tree/screens/main_pages/tree_page/widget/plot_list.dart';
+import 'package:tree/screens/main_pages/tree_page/widget/plot_list_options.dart';
 import 'package:tree/theme/themes.dart';
 
 import '../../../base/custom_route.dart';

@@ -6,15 +6,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tree/img_result_provider.dart';
+import 'package:tree/screens/main_pages/tree_page/img_result_provider.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
 import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
 import 'package:tree/utils/camera.dart';
 import 'dart:io';
 
 import 'app.dart';
-import 'farmer_provider.dart';
-import 'firebase_options.dart';
+import 'screens/main_pages/profile_page/farmer_provider.dart';
+import 'configs/firebase_options.dart';
 import 'map/map_download_provider.dart';
 
 Future<void> main() async {

@@ -6,6 +6,7 @@ import 'package:chaquopy/chaquopy.dart';
 
 import 'image_processor_interface.dart';
 
+/// not used in final product, testing depth evaluation only
 class DepthEvaluator {
   Future<String> evaluateDepth(ImageRaw raw) async{
     String rgbMatBase64 = base64Encode(raw.rgbMat ?? Uint8List(0));

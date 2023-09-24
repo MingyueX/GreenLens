@@ -7,7 +7,7 @@ import 'package:tree/screens/splash_screen/splash_screen_viewmodel.dart';
 
 import '../../base/custom_route.dart';
 import '../../base/widgets/loader.dart';
-import '../../farmer_provider.dart';
+import '../main_pages/profile_page/farmer_provider.dart';
 import '../page_navigation/page_navigation.dart';
 
 class SplashScreen extends StatelessWidget {

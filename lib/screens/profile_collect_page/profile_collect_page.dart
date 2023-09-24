@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tree/base/widgets/confirm_button.dart';
 import 'package:tree/base/widgets/shortcut_to_capture.dart';
-import 'package:tree/farmer_provider.dart';
+import 'package:tree/screens/main_pages/profile_page/farmer_provider.dart';
 import 'package:tree/screens/page_navigation/page_navigation.dart';
 import 'package:tree/services/storage/db_service.dart';
 import 'package:tree/theme/colors.dart';

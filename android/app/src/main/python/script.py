@@ -24,7 +24,11 @@ def text_thread_run(code, result_container):
     try:
         env = {}
         exec(code, env, env)
+        # Get the value from the 'result' variable
+        # Hence to get a return value, assign it to the 'result' variable
+        # Change this if you want to use a different variable name
         results = env.get('result', None)
+        # The value will be returned to the dart side as a list
         if isinstance(results, tuple):
             serialized_results = [serialize_to_json(item) for item in results]
         else:

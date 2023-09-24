@@ -4,7 +4,7 @@ import 'package:tree/screens/set_up_page/set_up_page.dart';
 import 'package:tree/theme/colors.dart';
 
 import '../../../base/widgets/gradient_bg.dart';
-import '../../../farmer_provider.dart';
+import 'farmer_provider.dart';
 import '../../../model/models.dart';
 
 class ProfilePage extends StatelessWidget {

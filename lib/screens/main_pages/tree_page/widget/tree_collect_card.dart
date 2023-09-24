@@ -10,7 +10,7 @@ import 'package:tree/screens/image_capture_page/image_capture_screen.dart';
 import 'package:tree/theme/colors.dart';
 import 'package:tree/utils/location.dart';
 
-import '../../../../img_result_provider.dart';
+import '../img_result_provider.dart';
 import '../../../../model/models.dart';
 import '../tree_page_viewmodel.dart';
 

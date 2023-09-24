@@ -3,7 +3,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:tree/base/widgets/check_box.dart';
 import 'package:tree/base/widgets/date.dart';
-import 'package:tree/farmer_provider.dart';
+import 'package:tree/screens/main_pages/profile_page/farmer_provider.dart';
 import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
 
 import '../../../../base/widgets/confirm_button.dart';

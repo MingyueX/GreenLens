@@ -1,15 +1,20 @@
+import 'package:GreenLens/screens/main_pages/tree_page/species_result_provider.dart';
+import 'package:GreenLens/screens/species_identify/camera_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'package:tree/base/widgets/check_box.dart';
-import 'package:tree/base/widgets/confirm_button.dart';
-import 'package:tree/screens/image_capture_page/image_capture_screen.dart';
-import 'package:tree/theme/colors.dart';
-import 'package:tree/utils/location.dart';
+import 'package:GreenLens/base/widgets/check_box.dart';
+import 'package:GreenLens/base/widgets/confirm_button.dart';
+import 'package:GreenLens/screens/image_capture_page/image_capture_screen.dart';
+import 'package:GreenLens/theme/colors.dart';
+import 'package:GreenLens/utils/location.dart';
 
+import '../../../../base/widgets/dialog.dart';
+import '../../../../utils/arcore.dart';
 import '../img_result_provider.dart';
 import '../../../../model/models.dart';
 import '../tree_page_viewmodel.dart';
@@ -39,6 +44,14 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
   final _latController = TextEditingController();
   final _longController = TextEditingController();
   final _diameterController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _speciesController = TextEditingController();
+  final _idController = TextEditingController();
+
+  String? _speciesImgUrl;
+  String? _diameterImgUrl;
+  String? _captureLocations;
+  String? _lineJson;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -46,28 +59,83 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
   void initState() {
     super.initState();
     _getLocation();
+    _diameterController.addListener(() {
+      _onDiameterTextChanged();
+    });
+    _speciesController.addListener(() {
+      _onSpeciesTextChanged();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        final imageResult =
+            Provider
+                .of<ImgResultProvider>(context, listen: true)
+                .imageResult;
+        if (imageResult != null) {
+          _diameterController.text = imageResult.diameter.toStringAsFixed(2);
+          _lineJson = imageResult.lineJson;
+        }
+
+        final diameterImageUrl =
+            Provider
+                .of<ImgResultProvider>(context, listen: true)
+                .cloudImageUrl;
+        if (diameterImageUrl != null) {
+          _diameterImgUrl = diameterImageUrl;
+        }
+
+        final locationsJson =
+            Provider
+                .of<ImgResultProvider>(context, listen: true)
+                .locationsJson;
+        if (locationsJson != null) {
+          _captureLocations = locationsJson;
+        }
+
+        final speciesName =
+            Provider
+                .of<SpeciesResultProvider>(context, listen: true)
+                .speciesName;
+        if (speciesName != null) {
+          _speciesController.text = speciesName;
+        }
+
+        final speciesImgUrl =
+            Provider
+                .of<SpeciesResultProvider>(context, listen: true)
+                .imageUrl;
+        if (speciesImgUrl != null) {
+          _speciesImgUrl = speciesImgUrl;
+        }
+      }
+    });
+    super.didChangeDependencies();
+  }
+
+  void _onDiameterTextChanged() {
+    Provider.of<ImgResultProvider>(context, listen: false).clear();
+  }
+
+  void _onSpeciesTextChanged() {
+    Provider.of<SpeciesResultProvider>(context, listen: false).clear();
   }
 
   _getLocation() async {
     LocationUtil.getLocation().then((value) {
-      if (value == null) return;
-      // TODO: handle null value (when user deny location permission)
-      setState(() {
+      if (value != null) {
         _latController.text = value.latitude.toStringAsFixed(2);
         _longController.text = value.longitude.toStringAsFixed(2);
-      });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TreePageViewModel>();
-
-    final imageResult =
-        Provider.of<ImgResultProvider>(context, listen: true).imageResult;
-    if (imageResult != null) {
-      _diameterController.text = imageResult.diameter.toStringAsFixed(2);
-    }
 
     final List<DropdownMenuEntry<TreeAliveCondition>> conditionEntries =
         <DropdownMenuEntry<TreeAliveCondition>>[];
@@ -99,6 +167,27 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
                   ],
                 ),
               ),
+              const SizedBox(height: spacing),
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Id",
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    Container(
+                        width: 195,
+                        height: 25,
+                        child: TextField(
+                          controller: _idController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.grey)),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.grey)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.grey)),
+                          ),))]),
               const SizedBox(height: spacing),
               Text("Condition",
                   style: Theme.of(context).textTheme.headlineMedium),
@@ -154,6 +243,8 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
                   latController: _latController,
                   longController: _longController,
                   diameterController: _diameterController,
+                  ageController: _ageController,
+                  speciesController: _speciesController,
                   selectedAliveCondition: _selectedAliveCondition,
                 ),
               if (selectedCondition == TreeCondition.noLongerExist)
@@ -199,7 +290,15 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
                         speciesId: 1,
                         condition: selectedCondition,
                         conditionDetail: _selectedAliveCondition,
-                        diameter: double.parse(_diameterController.text));
+                        diameter: double.parse(_diameterController.text),
+                        age: double.parse(_ageController.text),
+                        diameterUrl: _diameterImgUrl,
+                        species: _speciesController.text,
+                        speciesUrl: _speciesImgUrl,
+                        locationsJson: _captureLocations,
+                        lineJson: _lineJson,
+                        uid: int.parse(_idController.text),
+                    );
                     viewModel.addTree(tree);
                   }
                   // TODO: Implement
@@ -221,14 +320,15 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
 }
 
 class FormForAlive extends StatelessWidget {
-  const FormForAlive(
-      {Key? key,
-      required this.onDetailSelected,
-      required this.onRefreshLocation,
-      required this.latController,
-      required this.longController,
-      required this.diameterController,
-      required this.selectedAliveCondition})
+  const FormForAlive({Key? key,
+    required this.onDetailSelected,
+    required this.onRefreshLocation,
+    required this.latController,
+    required this.longController,
+    required this.diameterController,
+    required this.selectedAliveCondition,
+    required this.speciesController,
+    required this.ageController})
       : super(key: key);
 
   final TreeAliveCondition? selectedAliveCondition;
@@ -237,8 +337,44 @@ class FormForAlive extends StatelessWidget {
   final TextEditingController latController;
   final TextEditingController longController;
   final TextEditingController diameterController;
+  final TextEditingController ageController;
+  final TextEditingController speciesController;
 
   static const double spacing = 15;
+
+  void _handleARCoreCheck(BuildContext context) async {
+    try {
+      bool isInstalled = await ARCoreService.checkArcore();
+
+      if (isInstalled) {
+        if (context.mounted) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const ImageCaptureScreen()));
+        }
+      } else {
+        if (context.mounted) {
+          CustomDialog.show(context,
+              dialogType: DialogType.doubleButton,
+              message:
+              'ARCORE is not installed on your device. Please install it to continue.',
+              cancelText: 'Later',
+              confirmText: 'Install Now',
+              onConfirmed: () async {
+                await ARCoreService.checkAndPromptInstallation();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              });
+        }
+      }
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("ARCore failed or not supported on this device."),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -301,6 +437,63 @@ class FormForAlive extends StatelessWidget {
         ),
         const SizedBox(height: spacing),
         Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Age",
+                  style: Theme.of(context).textTheme.headlineMedium),
+              Container(
+                  width: 195,
+                  height: 25,
+                  child: TextField(
+                    controller: ageController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                    ),))]),
+        const SizedBox(height: spacing),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Species",
+                style: Theme.of(context).textTheme.headlineMedium),
+            Container(
+                width: 195,
+                height: 25,
+                child: Stack(children: [
+                  TextField(
+                    controller: speciesController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.grey)),
+                    ),
+                  ),
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 2),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => TakePictureScreen()));
+                              },
+                              child: const Text("SCAN➜"))))
+                ]))
+          ],
+        ),
+        const SizedBox(height: spacing),
+        Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -327,18 +520,18 @@ class FormForAlive extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 5, vertical: 2),
                           child: ElevatedButton(
+                              // onPressed: () {
+                              //   Navigator.of(context).push(MaterialPageRoute(
+                              //       builder: (context) =>
+                              //           const ImageCaptureScreen()));
+                              // },
                               onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ImageCaptureScreen()));
+                                _handleARCoreCheck(context);
                               },
                               child: const Text("CAPTURE➜"))))
                 ]))
           ],
         ),
-        const SizedBox(height: spacing),
-        Text("Species ID (not implemented)",
-            style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: spacing),
         Text("Is Eucalyptus? (not implemented)",
             style: Theme.of(context).textTheme.headlineMedium),

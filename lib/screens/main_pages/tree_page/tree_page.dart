@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tree/base/widgets/app_bar.dart';
-import 'package:tree/screens/main_pages/tree_page/new_tree_collection.dart';
-import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
-import 'package:tree/screens/main_pages/tree_page/widget/plot_list_options.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/base/widgets/app_bar.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/new_tree_collection.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/tree_page_viewmodel.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/widget/plot_list_options.dart';
+import 'package:GreenLens/theme/themes.dart';
 
 import '../../../base/custom_route.dart';
 import '../../../base/widgets/plain_button.dart';
@@ -30,8 +30,12 @@ class TreePage extends StatelessWidget {
     return Scaffold(
         appBar: CustomAppBar(
           title:
-              "Trees - ${currentPlot == null ? 'No plot selected' : 'Plot#$currentPlot'}",
+              currentPlot == null ? 'No plot selected' : 'Trees - Plot#$currentPlot',
           actions: {
+            Icons.list: () {
+              Navigator.push(context,
+                  CustomRoute(builder: (_) => const PlotListOptions()));
+            },
             Icons.add: () {
               if (plots.isEmpty) {
                 SnackBar snackBar = const SnackBar(
@@ -51,7 +55,7 @@ class TreePage extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (context) => const AddTreePage()));
               }
-            }
+            },
           },
         ),
         body: Container(
@@ -119,7 +123,6 @@ class TreePage extends StatelessWidget {
                       itemBuilder: (BuildContext context, int index) {
                         return TreeItem(
                           tree: state.trees[index],
-                          id: index + 1,
                           onDelete: (tree) => viewModel.removeTree(tree),
                         );
                       },
@@ -134,10 +137,9 @@ class TreePage extends StatelessWidget {
 
 class TreeItem extends StatelessWidget {
   const TreeItem(
-      {Key? key, required this.tree, required this.id, required this.onDelete})
+      {Key? key, required this.tree, required this.onDelete})
       : super(key: key);
 
-  final int id;
   final Tree tree;
 
   final Function onDelete;
@@ -166,7 +168,7 @@ class TreeItem extends StatelessWidget {
                                   text: 'Tree',
                                 ),
                                 TextSpan(
-                                    text: "#$id",
+                                    text: "#${tree.id}",
                                     style:
                                         Theme.of(context).textTheme.labelMedium)
                               ],

@@ -1,6 +1,8 @@
 *.ckpt
+*.ptl
 *.g.dart
 *.pth
+/android/key.properties
 
 # Miscellaneous
 *.class

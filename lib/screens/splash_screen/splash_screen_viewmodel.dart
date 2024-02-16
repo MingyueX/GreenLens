@@ -1,4 +1,5 @@
 import 'package:chaquopy/chaquopy.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +38,7 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
     }
   }
 
-  Future<void> loadModel() async {
+  Future<void> loadModel1() async {
     const code = '''
 import improc_all
 improc_all.initialize_model()
@@ -46,6 +47,16 @@ print("Model loaded")
 
     final result = await Chaquopy.executeCode(code).timeout(const Duration(minutes: 10));
     print(result);
+  }
+
+  Future<void> loadModel() async {
+    const MethodChannel channel = MethodChannel('com.example.tree/torch_model');
+    try {
+      await channel.invokeMethod('initialize_model');
+      print("Model loaded");
+    } on PlatformException catch (e) {
+      print(e);
+    }
   }
 }
 

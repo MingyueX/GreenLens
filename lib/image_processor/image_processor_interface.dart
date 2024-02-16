@@ -16,6 +16,7 @@ class ImageResult {
   double diameter;
   double depth;
   String? logInfo;
+  String? lineJson;
 
   ImageResult({
     this.displayImage,
@@ -24,6 +25,7 @@ class ImageResult {
     this.diameter = 0.0,
     this.depth = 0.0,
     this.logInfo,
+    this.lineJson,
   });
 }
 

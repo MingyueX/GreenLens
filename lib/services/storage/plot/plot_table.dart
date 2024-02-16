@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:tree/services/storage/farmer/farmer_table.dart';
+import 'package:GreenLens/services/storage/farmer/farmer_table.dart';
 
 class PlotTable extends Table {
   IntColumn get id => integer().autoIncrement()();

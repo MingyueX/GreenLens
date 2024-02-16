@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:tree/services/network/base_url_dlient.dart';
+import 'package:GreenLens/services/network/base_url_dlient.dart';
 
 enum HttpMethod {
   get('GET'),

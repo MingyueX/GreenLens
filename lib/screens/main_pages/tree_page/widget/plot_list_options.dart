@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
-import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/plot_page_viewmodel.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/tree_page_viewmodel.dart';
 
 class PlotListOptions extends StatelessWidget {
   const PlotListOptions({Key? key}) : super(key: key);
@@ -22,7 +22,9 @@ class PlotListOptions extends StatelessWidget {
           const SizedBox(height: 40),
           Text("Plot List", style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
-          Text("Choose any plot to view tree data",
+          Text(plots.length > 0 ?
+              "Choose any plot to view tree data"
+              : "No plots yet",
               style: Theme.of(context).textTheme.bodySmall),
           ListView.separated(
             itemCount: plots.length,

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
-import 'package:tree/map/region_mode.dart';
+import 'package:GreenLens/map/region_mode.dart';
 
 class DownloadProvider extends ChangeNotifier {
   RegionMode _regionMode = RegionMode.square;

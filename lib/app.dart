@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:tree/configs/constant.dart';
-import 'package:tree/screens/splash_screen/splash_screen.dart';
+import 'package:GreenLens/configs/constant.dart';
+import 'package:GreenLens/screens/splash_screen/splash_screen.dart';
 import 'theme/themes.dart';
 
 class MyApp extends StatelessWidget {

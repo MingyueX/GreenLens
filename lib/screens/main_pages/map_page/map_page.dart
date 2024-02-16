@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:tree/base/widgets/app_bar.dart';
-import 'package:tree/configs/constant.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/base/widgets/app_bar.dart';
+import 'package:GreenLens/configs/constant.dart';
+import 'package:GreenLens/theme/themes.dart';
 
 import '../../../theme/colors.dart';
 import '../../../utils/location.dart';

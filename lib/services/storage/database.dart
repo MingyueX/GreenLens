@@ -1,12 +1,12 @@
 import 'dart:io';
+import 'package:GreenLens/services/storage/tree/tree_table.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:tree/services/storage/plot/plot_table.dart';
-import 'package:tree/services/storage/queries.dart';
-import 'package:tree/services/storage/tree/tree_table.dart';
-import 'package:tree/services/storage/farmer/farmer_table.dart';
+import 'package:GreenLens/services/storage/plot/plot_table.dart';
+import 'package:GreenLens/services/storage/queries.dart';
+import 'package:GreenLens/services/storage/farmer/farmer_table.dart';
 
 import '../../model/models.dart';
 
@@ -60,6 +60,21 @@ class Database extends _$Database {
 
     return Future.sync(() => farmerFromDb(farmer as FarmerTableData));
   }
+
+  Future<List<PlotWithTrees>> fetchPlotsWithTrees(int participantId) async {
+
+    final List<Plot> plots = await searchPlotByFarmerId(participantId);
+
+    List<PlotWithTrees> plotsWithTrees = [];
+
+    for (final plot in plots) {
+      final List<Tree> trees = await searchTreeByPlotId(plot.id!);
+      plotsWithTrees.add(PlotWithTrees(plot: plot, trees: trees));
+    }
+
+    return plotsWithTrees.toList();
+  }
+
 
   // search functions for plot
   Future<Plot?> searchPlotById(int id) async {
@@ -222,6 +237,7 @@ class Database extends _$Database {
   TreeTableCompanion treeToDb(Tree t) {
     return TreeTableCompanion(
       id: const Value.absent(),
+      uid: Value(t.uid),
       plotId: Value(t.plotId),
       diameter: Value(t.diameter),
       locationLatitude: Value(t.locationLatitude),
@@ -232,12 +248,19 @@ class Database extends _$Database {
       condition: Value(t.condition.name),
       detail: Value(t.conditionDetail?.statusCode),
       causeOfDeath: Value(t.causeOfDeath),
+      age: Value(t.age),
+      diameterUrl: Value(t.diameterUrl),
+      species: Value(t.species),
+      speciesUrl: Value(t.speciesUrl),
+      locationsJson: Value(t.locationsJson),
+      lineJson: Value(t.lineJson),
     );
   }
 
   Tree treeFromDb(TreeTableData t) {
     return Tree(
       id: t.id,
+      uid: t.uid,
       plotId: t.plotId,
       diameter: t.diameter,
       locationLatitude: t.locationLatitude,
@@ -248,6 +271,12 @@ class Database extends _$Database {
       condition: TreeCondition.fromString(t.condition),
       conditionDetail: TreeAliveCondition.fromString(t.detail),
       causeOfDeath: t.causeOfDeath,
+      age: t.age,
+      diameterUrl: t.diameterUrl,
+      species: t.species,
+      speciesUrl: t.speciesUrl,
+      locationsJson: t.locationsJson,
+      lineJson: t.lineJson,
     );
   }
 }

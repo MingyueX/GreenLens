@@ -1,16 +1,24 @@
+import 'dart:io';
+
+import 'package:GreenLens/base/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:tree/base/widgets/app_bar.dart';
-import 'package:tree/base/widgets/plain_button.dart';
-import 'package:tree/screens/main_pages/plot_page/new_plot_collection.dart';
-import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
-import 'package:tree/screens/main_pages/tree_page/tree_page_viewmodel.dart';
-import 'package:tree/screens/page_navigation/page_nav_viewmodel.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/base/widgets/app_bar.dart';
+import 'package:GreenLens/base/widgets/plain_button.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/new_plot_collection.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/plot_page_viewmodel.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/tree_page_viewmodel.dart';
+import 'package:GreenLens/screens/page_navigation/page_nav_viewmodel.dart';
+import 'package:GreenLens/theme/themes.dart';
+import 'package:provider/provider.dart';
+
 
 import '../../../model/models.dart';
+import '../../../services/storage/db_service.dart';
 import '../../../theme/colors.dart';
+import '../../../utils/file_storage.dart';
+import '../profile_page/farmer_provider.dart';
 
 class PlotPage extends StatelessWidget {
   const PlotPage({Key? key}) : super(key: key);
@@ -25,6 +33,64 @@ class PlotPage extends StatelessWidget {
         appBar: CustomAppBar(
           title: 'Plots',
           actions: {
+            Icons.save_alt: () async {
+              CustomDialog.show(context,
+                title: 'Export Data',
+                message: "Export as CSV?",
+                  dialogType: DialogType.doubleButton,
+              onConfirmed: () async {
+                final dbService = DatabaseService();
+                Farmer? currentUser;
+                if (context.mounted) {
+                  currentUser = Provider
+                      .of<FarmerProvider>(context, listen: false)
+                      .farmer;
+                }
+                if (currentUser != null) {
+                  final List<PlotWithTrees> plots = await dbService
+                      .fetchPlotsWithTrees(currentUser.participantId);
+                  List<String> rows = [];
+
+                  // Define CSV header
+                  rows.add(
+                      "Farmer ID,Date,Harvesting,Thinning,Dominant Land Use,Tree ID,Diameter,Location Latitude,Location Longitude,Orientation,SpeciesId,Is Eucalyptus,Condition,Detail,Cause Of Death,Age,Diameter URL,Species,Species URL,Locations Json,Line Json");
+
+                  // Iterate through each plot and its trees
+                  for (final plotWithTrees in plots) {
+                    for (final tree in plotWithTrees.trees) {
+                      // Create a row for each tree, including plot information
+                      rows.add("${plotWithTrees.plot
+                          .farmerId},${plotWithTrees
+                          .plot.date.toIso8601String()},${plotWithTrees.plot
+                          .harvesting},${plotWithTrees.plot
+                          .thinning},${plotWithTrees.plot
+                          .dominantLandUse},${tree.id},${tree.diameter ??
+                          ''},${tree.locationLatitude},${tree
+                          .locationLongitude},${tree.orientation ?? ''},${tree
+                          .speciesId ?? ''},${tree.isEucalyptus},${tree
+                          .condition},${tree.conditionDetail ?? ''},${tree
+                          .causeOfDeath ?? ''},${tree.age ?? ''},${tree
+                          .diameterUrl ?? ''},${tree.species ?? ''},${tree
+                          .speciesUrl ?? ''},${tree.locationsJson ?? ''},${tree
+                          .lineJson ?? ''}");
+                    }
+                  }
+
+                  // Join all rows into a single string separated by newline characters
+                  String csvStr = rows.join('\n');
+
+                  final path = await FileStorage.getBasePath();
+                  final now = DateTime.now();
+                  String date = DateFormat('yyyy-MM-dd').format(now);
+                  String time = DateFormat.Hms().format(now).replaceAll(':', '');
+                  final file = File('$path/${date}_${time}_plotAndTreeData.csv');
+                  await file.writeAsString(csvStr);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                }
+              });
+            },
             Icons.add: () {
               Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(builder: (context) => const AddPlotPage()));
@@ -122,14 +188,14 @@ class PlotItem extends StatelessWidget {
                 const SizedBox(
                   height: 5,
                 ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TwoSegRichText(
-                          seg1: 'Cluster', seg2: '#${plot.clusterId}'),
-                      TwoSegRichText(seg1: 'Group', seg2: '#${plot.groupId}'),
-                      TwoSegRichText(seg1: 'Farm', seg2: '#${plot.farmId}')
-                    ]),
+                // Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       TwoSegRichText(
+                //           seg1: 'Cluster', seg2: '#${plot.clusterId}'),
+                //       TwoSegRichText(seg1: 'Group', seg2: '#${plot.groupId}'),
+                //       TwoSegRichText(seg1: 'Farm', seg2: '#${plot.farmId}')
+                //     ]),
                 if (plot.harvesting)
                   const Padding(
                       padding: EdgeInsets.only(top: 5),

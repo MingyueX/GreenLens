@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:tree/screens/main_pages/tree_page/widget/tree_collect_card.dart';
+import 'package:GreenLens/screens/main_pages/tree_page/widget/tree_collect_card.dart';
 
 import '../../base/widgets/confirm_button.dart';
 import '../../base/widgets/gradient_bg.dart';

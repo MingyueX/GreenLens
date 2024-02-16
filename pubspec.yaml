@@ -1,4 +1,4 @@
-name: tree
+name: GreenLens
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -52,9 +52,11 @@ dependencies:
   shared_preferences: ^2.2.0
   image: ^3.0.0
   firebase_core: ^2.15.1
+  firebase_storage: ^11.6.0
   latlong2: ^0.8.0
   camera: ^0.10.5+4
   http: ^0.13.5
+  moor2csv: ^2.0.1
   collection:
 
   ar_flutter_plugin:
@@ -72,6 +74,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.11.0"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -81,6 +84,11 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   drift_dev: ^2.9.0
   build_runner: ^2.4.6
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

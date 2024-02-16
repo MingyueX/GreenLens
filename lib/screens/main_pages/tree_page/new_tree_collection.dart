@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tree/theme/colors.dart';
+import 'package:GreenLens/theme/colors.dart';
 
 import '../../../base/widgets/gradient_bg.dart';
 import 'widget/tree_collect_card.dart';

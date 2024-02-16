@@ -6,10 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum FileType {
+  groundTruth,
   rgb,
   depthImgData,
   elevation,
   rawDepthData,
+  estDiameter,
   confidenceImgData;
 
   String get suffix {
@@ -24,6 +26,10 @@ enum FileType {
         return '';
       case FileType.confidenceImgData:
         return '';
+      case FileType.groundTruth:
+        return '.txt';
+      case FileType.estDiameter:
+        return '.txt';
       default:
         return '';
     }
@@ -93,13 +99,29 @@ class FileStorage {
     await saveFile(content, targetPath);
   }
 
+  static Future<void> saveToFileEstDiameter(
+      int? treeId, double estDiameter, String targetPath) async {
+    final content = '$estDiameter\n';
+
+    await saveFile(content, targetPath);
+  }
+
+  static Future<void> saveToFileGroundTruth(
+      int? treeId, String groundTruth, String targetPath) async {
+    final content = '$groundTruth\n';
+
+    await saveFile(content, targetPath);
+  }
+
   static Future<void> saveToFileResults({
     int? treeId,
-    required double elevation,
+    // required double elevation,
+    required double estDiameter,
     required Uint8List image,
     required DepthImgArrays arrays,
     required DepthImgArrays? rawDepthArrays,
     required DepthImgArrays? confidenceArrays,
+    // required String groundTruth,
   }) async {
     final filePath = await getFolderPath(treeId);
     final targetPathRGB = '$filePath/${getFileName(FileType.rgb)}';
@@ -110,13 +132,19 @@ class FileStorage {
         '$filePath/${getFileName(FileType.rawDepthData)}';
     final targetPathConfidenceImgData =
         '$filePath/${getFileName(FileType.confidenceImgData)}';
+    final targetPathEstDiameter =
+        '$filePath/${getFileName(FileType.estDiameter)}';
+    // final targetPathGroundTruth =
+        '$filePath/${getFileName(FileType.groundTruth)}';
 
     await saveToFileRGB(treeId, image, targetPathRGB);
-    await saveToFileElevation(treeId, elevation, targetPathElevation);
+    // await saveToFileElevation(treeId, elevation, targetPathElevation);
+    await saveToFileEstDiameter(treeId, estDiameter, targetPathEstDiameter);
     await saveDepthImgDataToFile(treeId, arrays, targetPathDepthImgData);
     await saveDepthImgDataToFile(
         treeId, rawDepthArrays, targetPathRawDepthData);
     await saveDepthImgDataToFile(
         treeId, confidenceArrays, targetPathConfidenceImgData);
+    // await saveToFileGroundTruth(treeId, groundTruth, targetPathGroundTruth);
   }
 }

@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tree/base/widgets/confirm_button.dart';
-import 'package:tree/base/widgets/plain_button.dart';
-import 'package:tree/screens/main_pages/profile_page/farmer_provider.dart';
-import 'package:tree/screens/main_pages/plot_page/widget/plot_collect_card.dart';
-import 'package:tree/screens/plot_list_page/collected_plot_list.dart';
+import 'package:GreenLens/base/widgets/confirm_button.dart';
+import 'package:GreenLens/base/widgets/plain_button.dart';
+import 'package:GreenLens/screens/main_pages/profile_page/farmer_provider.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/widget/plot_collect_card.dart';
+import 'package:GreenLens/screens/plot_list_page/collected_plot_list.dart';
 
 import '../../base/widgets/gradient_bg.dart';
 

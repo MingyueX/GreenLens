@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:tree/screens/main_pages/map_page/map_page.dart';
-import 'package:tree/screens/main_pages/plot_page/plot_page.dart';
-import 'package:tree/screens/main_pages/profile_page/profile_page.dart';
-import 'package:tree/theme/colors.dart';
+import 'package:GreenLens/screens/main_pages/map_page/map_page.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/plot_page.dart';
+import 'package:GreenLens/screens/main_pages/profile_page/profile_page.dart';
+import 'package:GreenLens/theme/colors.dart';
 
 import '../../theme/icons.dart';
 import '../main_pages/tree_page/tree_page.dart';

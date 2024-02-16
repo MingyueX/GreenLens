@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tree/screens/set_up_page/set_up_page.dart';
-import 'package:tree/theme/colors.dart';
+import 'package:GreenLens/screens/set_up_page/set_up_page.dart';
+import 'package:GreenLens/theme/colors.dart';
 
 import '../../../base/widgets/gradient_bg.dart';
 import 'farmer_provider.dart';
@@ -70,8 +70,6 @@ class ProfilePage extends StatelessWidget {
                 width: 200,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                        builder: (context) => const SetUpPage()));
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,

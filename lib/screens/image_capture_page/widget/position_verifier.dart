@@ -5,7 +5,7 @@ import '../../../theme/colors.dart';
 class PositionVerifier extends StatelessWidget {
   const PositionVerifier({Key? key, required this.inGoodRange, this.accelerometerValues, required this.qualityValue}) : super(key: key);
 
-  final double qualityValue;
+  final double? qualityValue;
   final bool inGoodRange;
   final List<double>? accelerometerValues;
 
@@ -23,9 +23,10 @@ class PositionVerifier extends StatelessWidget {
         .size
         .height;
 
-    Color boxColor = qualityValue < 0.5
+    Color boxColor = qualityValue == null ? AppColors.lightBlue :
+    qualityValue! < 0.5
         ? AppColors.lightRed
-        : qualityValue >= 0.75 ? AppColors
+        : qualityValue! >= 0.75 ? AppColors
         .lightGreen : AppColors
         .lightBlue;
 
@@ -64,18 +65,20 @@ class PositionVerifier extends StatelessWidget {
             ),
           )
       ),
-      Align(
-          alignment: Alignment.center,
-          child: Container(
-            margin: const EdgeInsets.only(top: 40),
-            child: Text(
-                qualityValue.toStringAsFixed(2),
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .labelLarge!.copyWith(color: boxColor)
-            ),
-          )),
+      if (qualityValue != null)
+        /// quality value
+        Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.only(top: 40),
+              child: Text(
+                  qualityValue!.toStringAsFixed(2),
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .labelLarge!.copyWith(color: boxColor)
+              ),
+            )),
       if (accelerometerValues != null)
         /// pose indicator
         Positioned(

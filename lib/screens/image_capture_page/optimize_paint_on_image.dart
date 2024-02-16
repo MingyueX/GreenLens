@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:ar_flutter_plugin/models/camera_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:tree/theme/colors.dart';
+import 'package:GreenLens/theme/colors.dart';
 
 class DraggableImagePainter extends StatefulWidget {
   const DraggableImagePainter({Key? key, this.image, required this.cameraImage})

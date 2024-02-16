@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/theme/themes.dart';
 
 import '../../theme/colors.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tree/base/widgets/plain_button.dart';
+import 'package:GreenLens/base/widgets/plain_button.dart';
 
 import '../../base/widgets/confirm_button.dart';
 import '../../base/widgets/gradient_bg.dart';

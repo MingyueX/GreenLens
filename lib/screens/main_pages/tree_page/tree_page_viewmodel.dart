@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tree/model/models.dart';
+import 'package:GreenLens/model/models.dart';
 
 import '../../../services/storage/db_service.dart';
 

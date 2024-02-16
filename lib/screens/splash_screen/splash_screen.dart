@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:tree/screens/main_pages/plot_page/plot_page_viewmodel.dart';
-import 'package:tree/screens/profile_collect_page/profile_collect_page.dart';
-import 'package:tree/screens/splash_screen/splash_screen_viewmodel.dart';
+import 'package:GreenLens/screens/main_pages/plot_page/plot_page_viewmodel.dart';
+import 'package:GreenLens/screens/profile_collect_page/profile_collect_page.dart';
+import 'package:GreenLens/screens/splash_screen/splash_screen_viewmodel.dart';
 
 import '../../base/custom_route.dart';
 import '../../base/widgets/loader.dart';
@@ -54,7 +54,7 @@ class SplashScreen extends StatelessWidget {
             });
           }
           return Center(
-            child: Image.asset("assets/images/splash_screen.png"),
+            child: Image.asset("assets/images/splash.png"),
           );
         }));
   }

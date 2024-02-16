@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tree/base/widgets/confirm_button.dart';
-import 'package:tree/base/widgets/shortcut_to_capture.dart';
-import 'package:tree/screens/main_pages/profile_page/farmer_provider.dart';
-import 'package:tree/screens/page_navigation/page_navigation.dart';
-import 'package:tree/services/storage/db_service.dart';
-import 'package:tree/theme/colors.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/base/widgets/confirm_button.dart';
+import 'package:GreenLens/base/widgets/shortcut_to_capture.dart';
+import 'package:GreenLens/screens/main_pages/profile_page/farmer_provider.dart';
+import 'package:GreenLens/screens/page_navigation/page_navigation.dart';
+import 'package:GreenLens/services/storage/db_service.dart';
+import 'package:GreenLens/theme/colors.dart';
+import 'package:GreenLens/theme/themes.dart';
 
 import '../../base/widgets/gradient_bg.dart';
 import '../../model/models.dart';
+import '../main_pages/plot_page/plot_page_viewmodel.dart';
 
 class ProfileCollectPage extends StatefulWidget {
   const ProfileCollectPage({Key? key}) : super(key: key);
@@ -133,7 +134,20 @@ class _ProfileCollectPageState extends State<ProfileCollectPage> {
                           final prefs = await SharedPreferences.getInstance();
                           prefs.setInt("lastFarmer", farmer.participantId);
                           final dbService = DatabaseService();
-                          dbService.insertFarmer(farmer);
+                          final existFarmer = await dbService.searchFarmer(farmer.participantId);
+                          if (existFarmer != null) {
+                            WidgetsBinding.instance!.addPostFrameCallback((_) async {
+                              await Provider.of<FarmerProvider>(context, listen: false)
+                                  .setFarmer(existFarmer);
+                              if (context.mounted) {
+                                await context
+                                    .read<PlotPageViewModel>()
+                                    .setFarmer(existFarmer.participantId);
+                              }
+                            });
+                          } else {
+                            dbService.insertFarmer(farmer);
+                          }
                           if (context.mounted) {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => const TabbedPage()));

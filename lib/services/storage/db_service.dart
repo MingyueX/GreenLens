@@ -1,4 +1,4 @@
-import 'package:tree/services/storage/database.dart';
+import 'package:GreenLens/services/storage/database.dart';
 
 import '../../model/models.dart';
 
@@ -22,6 +22,8 @@ class DatabaseService {
   Future<List<Plot>> searchPlotByFarmerId(int id) => db.searchPlotByFarmerId(id);
 
   Future<List<Plot>> searchPlotByClusterId(int id) => db.searchPlotByClusterId(id);
+
+  Future<List<PlotWithTrees>> fetchPlotsWithTrees(int id) => db.fetchPlotsWithTrees(id);
 
   Future<Tree?> searchTreeById(int id) => db.searchTreeById(id);
 

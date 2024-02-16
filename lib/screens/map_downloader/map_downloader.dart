@@ -5,11 +5,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:tree/screens/map_downloader/widgets/cached_map.dart';
-import 'package:tree/screens/map_downloader/widgets/map_view.dart';
-import 'package:tree/screens/map_downloader/widgets/shape_options.dart';
-import 'package:tree/theme/colors.dart';
-import 'package:tree/theme/themes.dart';
+import 'package:GreenLens/screens/map_downloader/widgets/cached_map.dart';
+import 'package:GreenLens/screens/map_downloader/widgets/map_view.dart';
+import 'package:GreenLens/screens/map_downloader/widgets/shape_options.dart';
+import 'package:GreenLens/theme/colors.dart';
+import 'package:GreenLens/theme/themes.dart';
 
 import '../../configs/constant.dart';
 import '../../map/map_download_provider.dart';

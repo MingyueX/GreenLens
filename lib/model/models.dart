@@ -70,7 +70,8 @@ enum LandUse {
 }
 
 class Tree {
-  int? id;
+  int? id;  // auto increment id in database
+  int? uid; // user set id
   final int plotId;
   double? diameter;
   ui.Image? displayImage;
@@ -82,9 +83,16 @@ class Tree {
   TreeCondition condition;
   TreeAliveCondition? conditionDetail;
   String? causeOfDeath;
+  double? age;
+  String? diameterUrl;
+  String? species;
+  String? speciesUrl;
+  String? lineJson; // line of trunk edges
+  String? locationsJson; // List of locations when user is capturing diameter
 
   Tree({
     this.id,
+    this.uid,
     required this.plotId,
     this.diameter,
     this.displayImage,
@@ -96,6 +104,12 @@ class Tree {
     required this.condition,
     this.conditionDetail,
     this.causeOfDeath,
+    this.age,
+    this.diameterUrl,
+    this.species,
+    this.speciesUrl,
+    this.locationsJson,
+    this.lineJson
   });
 }
 
@@ -217,4 +231,11 @@ enum KillProcess {
   final String statusCode;
 
   const KillProcess(this.detail, this.statusCode);
+}
+
+class PlotWithTrees {
+  final Plot plot;
+  final List<Tree> trees;
+
+  PlotWithTrees({required this.plot, required this.trees});
 }

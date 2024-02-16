@@ -12,6 +12,7 @@ class AppColors {
   static const lightRed = Color(0xFFFFE7E7);
 
   static const grey = Color(0xFF9AA09A);
+  static const lightGrey = Color(0xFFF0F0F0);
 
   static const gradientBgTop = Color(0x4CCCE59D);
   static const gradientBgBottom = Color(0x00CCE59D);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:tree/base/custom_route.dart';
+import 'package:GreenLens/base/custom_route.dart';
 
 enum DialogType { singleButton, doubleButton }
 
@@ -21,10 +21,10 @@ class CustomDialog {
             PlatformDialogAction(
                 child: Text(cancelText ?? "Cancel"),
                 onPressed: () {
-                  Navigator.of(context).pop();
                   if (onCanceled != null) {
                     onCanceled();
                   }
+                  Navigator.of(context).pop();
                 }),
           PlatformDialogAction(
             child: Text(confirmText ?? "OK"),

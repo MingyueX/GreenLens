@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import '../../utils/camera.dart';
 
 class TakePictureScreen extends StatefulWidget {
+  final Function(String) onImgSaved;
+
   TakePictureScreen({
+    required this.onImgSaved,
     super.key,
   });
 
@@ -66,7 +69,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             // Navigate to the DisplayPictureScreen
             await Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(imagePath: image.path),
+                builder: (context) => DisplayPictureScreen(imagePath: image.path, onImgSaved: widget.onImgSaved),
               ),
             );
           } catch (e) {

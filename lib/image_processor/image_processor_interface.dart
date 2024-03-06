@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 abstract class ImageProcessorInterface {
 
-  Future<Map<String, dynamic>> processImage(BuildContext context, ImageRaw raw);
+  Future<Map<String, dynamic>> processImage(BuildContext context, ImageRaw raw, double focalLength);
 
 }
 

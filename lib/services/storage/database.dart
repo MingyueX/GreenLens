@@ -40,8 +40,8 @@ class Database extends _$Database {
     await dbQuery.insert(plotTable, plotToDb(plot), null);
   }
 
-  Future<void> insertTree(Tree tree) async {
-    await dbQuery.insert(treeTable, treeToDb(tree), null);
+  Future<int> insertTree(Tree tree) async {
+    return await dbQuery.insert(treeTable, treeToDb(tree), null);
   }
 
   Future<void> insertAllPlot(List<Plot> plots) async {
@@ -63,12 +63,12 @@ class Database extends _$Database {
 
   Future<List<PlotWithTrees>> fetchPlotsWithTrees(int participantId) async {
 
-    final List<Plot> plots = await searchPlotByFarmerId(participantId);
+    final List<Plot> plots = await searchAllPlotByFarmerId(participantId);
 
     List<PlotWithTrees> plotsWithTrees = [];
 
     for (final plot in plots) {
-      final List<Tree> trees = await searchTreeByPlotId(plot.id!);
+      final List<Tree> trees = await searchAllTreeByPlotId(plot.id!);
       plotsWithTrees.add(PlotWithTrees(plot: plot, trees: trees));
     }
 
@@ -77,8 +77,8 @@ class Database extends _$Database {
 
 
   // search functions for plot
-  Future<Plot?> searchPlotById(int id) async {
-    final plot = await dbQuery.select(plotTable, (p) => p.id.equals(id));
+  Future<Plot?> searchValidPlotById(int id) async {
+    final plot = await dbQuery.select(plotTable, (p) => p.id.equals(id), (p) => p.isValid.equals(true));
     if (plot == null) {
       return null;
     }
@@ -86,27 +86,35 @@ class Database extends _$Database {
     return Future.sync(() => plotFromDb(plot as PlotTableData));
   }
 
-  Future<List<Plot>> searchPlotByFarmerId(int id) async {
+  Future<List<Plot>> searchValidPlotByFarmerId(int id) async {
+    final plotList = await dbQuery.search(plotTable, (p) => p.farmerId.equals(id), (p) => p.isValid.equals(true));
+
+    return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
+  }
+
+  Future<List<Plot>> searchAllPlotByFarmerId(int id) async {
     final plotList = await dbQuery.search(plotTable, (p) => p.farmerId.equals(id));
 
     return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
   }
 
-  Future<List<Plot>> searchPlotByClusterId(int id) async {
-    final plotList = await dbQuery.search(plotTable, (p) => p.clusterId.equals(id));
-
-    return plotList.map((p) => plotFromDb(p as PlotTableData)).toList();
-  }
-
-  Future<List<Plot>> searchPlotByGroupId(int id) async {
-    final plotList = await dbQuery.search(plotTable, (p) => p.groupId.equals(id));
-
-    return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
-  }
+  // Future<List<Plot>> searchPlotByClusterId(int id) async {
+  //   bool filter(PlotTableData p) => p.clusterId == id && p.isValid == true;
+  //   final plotList = await dbQuery.search(plotTable, (p) => filter(p));
+  //
+  //   return plotList.map((p) => plotFromDb(p as PlotTableData)).toList();
+  // }
+  //
+  // Future<List<Plot>> searchPlotByGroupId(int id) async {
+  //   bool filter(PlotTableData p) => p.groupId == id && p.isValid == true;
+  //   final plotList = await dbQuery.search(plotTable, (p) => filter(p));
+  //
+  //   return Future.sync(() => (plotList.map((p) => plotFromDb(p as PlotTableData))).toList());
+  // }
 
   // search functions for tree
-  Future<Tree?> searchTreeById(int id) async {
-    final tree = await dbQuery.select(treeTable, (t) => t.id.equals(id));
+  Future<Tree?> searchValidTreeById(int id) async {
+    final tree = await dbQuery.select(treeTable, (t) => t.id.equals(id), (t) => t.isValid.equals(true));
     if (tree == null) {
       return null;
     }
@@ -114,27 +122,14 @@ class Database extends _$Database {
     return Future.sync(() => treeFromDb(tree as TreeTableData));
   }
 
-  Future<List<Tree>> searchTreeByPlotId(int id) async {
+  Future<List<Tree>> searchValidTreeByPlotId(int id) async {
+    final treeList = await dbQuery.search(treeTable, (t) => t.plotId.equals(id), (t) => t.isValid.equals(true));
+
+    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
+  }
+
+  Future<List<Tree>> searchAllTreeByPlotId(int id) async {
     final treeList = await dbQuery.search(treeTable, (t) => t.plotId.equals(id));
-
-    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
-  }
-
-  Future<List<Tree>> searchTreeBySpeciesId(int id) async {
-    final treeList = await dbQuery.search(treeTable, (t) => t.speciesId.equals(id));
-
-    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
-  }
-
-  Future<List<Tree>> searchTreeByTreeCondition(TreeCondition cond) async {
-    final treeList = await dbQuery.search(treeTable, (t) => t.treeCondition.equals(cond.name));
-
-    return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
-  }
-
-  Future<List<Tree>> searchTreeByDiameter(int minDiameter, int maxDiameter) async {
-    bool filter(TreeTableData t) => t.diameter != null && t.diameter! >= minDiameter && t.diameter! <= maxDiameter;
-    final treeList = await dbQuery.search(treeTable, (t) => filter(t));
 
     return Future.sync(() => (treeList.map((t) => treeFromDb(t as TreeTableData))).toList());
   }
@@ -185,7 +180,27 @@ class Database extends _$Database {
     await dbQuery.deleteAll(farmerTable);
   }
 
+  Future<void> markPlotAsInvalid(int plotId) async {
+    await dbQuery.updateFieldWhere(
+      table: plotTable,
+      whereCondition: (tbl) => tbl.id.equals(plotId),
+      updatedValues: const PlotTableCompanion(isValid: Value(false)),
+    );
 
+    await dbQuery.updateFieldWhere(
+      table: treeTable,
+      whereCondition: (tbl) => tbl.plotId.equals(plotId),
+      updatedValues: const TreeTableCompanion(isValid: Value(false)),
+    );
+  }
+
+  Future<void> markTreeAsInvalid(int treeId) async {
+    await dbQuery.updateFieldWhere(
+      table: treeTable,
+      whereCondition: (tbl) => tbl.id.equals(treeId),
+      updatedValues: const TreeTableCompanion(isValid: Value(false)),
+    );
+  }
 
   // Conversion for Farmer
   FarmerTableCompanion farmerToDb(Farmer f) {
@@ -207,36 +222,40 @@ class Database extends _$Database {
   // Conversion for Plot
   PlotTableCompanion plotToDb(Plot p) {
     return PlotTableCompanion(
-      id: const Value.absent(),
+      id: p.id == null ? const Value.absent() : Value(p.id!),
+      uid: Value(p.uid),
       farmerId: Value(p.farmerId),
-      clusterId: Value(p.clusterId),
-      groupId: Value(p.groupId),
-      farmId: Value(p.farmId),
+      // clusterId: Value(p.clusterId),
+      // groupId: Value(p.groupId),
+      // farmId: Value(p.farmId),
       date: Value(p.date),
       harvesting: Value(p.harvesting),
       thinning: Value(p.thinning),
       dominantLandUse: Value(p.dominantLandUse),
+      isValid: Value(p.isValid),
     );
   }
 
   Plot plotFromDb(PlotTableData p) {
     return Plot(
       id: p.id,
+      uid: p.uid,
       farmerId: p.farmerId,
-      clusterId: p.clusterId,
-      groupId: p.groupId,
-      farmId: p.farmId,
+      // clusterId: p.clusterId,
+      // groupId: p.groupId,
+      // farmId: p.farmId,
       date: p.date,
       harvesting: p.harvesting,
       thinning: p.thinning,
       dominantLandUse: p.dominantLandUse,
+      isValid: p.isValid,
     );
   }
 
   // Conversion for Tree
   TreeTableCompanion treeToDb(Tree t) {
     return TreeTableCompanion(
-      id: const Value.absent(),
+      id: t.id == null ? const Value.absent() : Value(t.id!),
       uid: Value(t.uid),
       plotId: Value(t.plotId),
       diameter: Value(t.diameter),
@@ -247,13 +266,15 @@ class Database extends _$Database {
       isEucalyptus: Value(t.isEucalyptus),
       condition: Value(t.condition.name),
       detail: Value(t.conditionDetail?.statusCode),
+      physicalMechanism: Value(t.physicalMechanism?.statusCode),
+      numTreesInMortality: Value(t.numTreesInMortality?.statusCode),
+      killProcess: Value(t.killProcess?.statusCode),
       causeOfDeath: Value(t.causeOfDeath),
       age: Value(t.age),
-      diameterUrl: Value(t.diameterUrl),
       species: Value(t.species),
-      speciesUrl: Value(t.speciesUrl),
       locationsJson: Value(t.locationsJson),
       lineJson: Value(t.lineJson),
+      isValid: Value(t.isValid),
     );
   }
 
@@ -270,13 +291,15 @@ class Database extends _$Database {
       isEucalyptus: t.isEucalyptus,
       condition: TreeCondition.fromString(t.condition),
       conditionDetail: TreeAliveCondition.fromString(t.detail),
+      physicalMechanism: PhysicalMechanism.fromString(t.physicalMechanism),
+      numTreesInMortality: NumTreesInMortality.fromString(t.numTreesInMortality),
+      killProcess: KillProcess.fromString(t.killProcess),
       causeOfDeath: t.causeOfDeath,
       age: t.age,
-      diameterUrl: t.diameterUrl,
       species: t.species,
-      speciesUrl: t.speciesUrl,
       locationsJson: t.locationsJson,
       lineJson: t.lineJson,
+      isValid: t.isValid,
     );
   }
 }

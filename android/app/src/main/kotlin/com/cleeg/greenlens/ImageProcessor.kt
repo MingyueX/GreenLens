@@ -90,7 +90,7 @@ class ImageProcessor(private val context: Context) {
         return Pair(imageRgbTensor, depthTensor)
     }
 
-    fun processImage(rgbArr: ByteArray, depthArr: List<Double>, depthWidth: Int, depthHeight: Int): String {
+    fun processImage(rgbArr: ByteArray, depthArr: List<Double>, depthWidth: Int, depthHeight: Int, focalLength: Double?): String {
         val pre = getPreProcess(depthArr, rgbArr, depthWidth, depthHeight)
         val gtWidth = pre.third.first
         val gtHeight = pre.third.second
@@ -105,6 +105,20 @@ class ImageProcessor(private val context: Context) {
         val pythonModule = python.getModule("improc_all")
 
         @Suppress("UNCHECKED_CAST")
+        if (focalLength != null) {
+            return pythonModule.callAttr("run", outputArray, gtWidth, gtHeight, focalLength / 3 * 2).toString()
+        }
         return pythonModule.callAttr("run", outputArray, gtWidth, gtHeight).toString()
+    }
+
+    fun processAfterAdjustment(depthArr: List<Double>, m1: Double, n1:Double, m2: Double, n2: Double, focalLength: Double?): String {
+        val python = Python.getInstance()
+        val pythonModule = python.getModule("improc_all")
+        val doubleArray = depthArr.toDoubleArray()
+        @Suppress("UNCHECKED_CAST")
+        if (focalLength != null) {
+            return pythonModule.callAttr("calculate_DBH_after_adjustment", doubleArray, m1, m2, n1, n2, focalLength / 3 * 2).toString()
+        }
+        return pythonModule.callAttr("calculate_DBH_after_adjustment", doubleArray, m1, m2, n1, n2).toString()
     }
 }

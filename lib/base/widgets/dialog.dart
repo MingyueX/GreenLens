@@ -28,9 +28,14 @@ class CustomDialog {
                 }),
           PlatformDialogAction(
             child: Text(confirmText ?? "OK"),
-            onPressed: () => onConfirmed != null
-                ? onConfirmed()
-                : Navigator.of(context).pop(),
+            onPressed: () {
+              if (onConfirmed != null) {
+                onConfirmed();
+              }
+              else {
+                Navigator.of(context).pop();
+              }
+            }
           ),
         ],
       );

@@ -1,14 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:GreenLens/image_processor/image_processor_interface.dart';
 
 /// To be removed
 class ImgResultProvider extends ChangeNotifier {
   ImageResult? _imageResult;
-  String? _cloudImageUrl;
+
   String? _locationsJson;
 
   ImageResult? get imageResult => _imageResult;
-  String? get cloudImageUrl => _cloudImageUrl;
   String? get locationsJson => _locationsJson;
 
   set imageResult(ImageResult? value) {
@@ -16,8 +17,7 @@ class ImgResultProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  set cloudImageUrl(String? value) {
-    _cloudImageUrl = value;
+  set speciesImage(Uint8List? value) {
     notifyListeners();
   }
 
@@ -28,8 +28,6 @@ class ImgResultProvider extends ChangeNotifier {
 
   void clear() {
     _imageResult = null;
-    // _cloudImageUrl = null;
-    // _locationsJson = null;
     notifyListeners();
   }
 }

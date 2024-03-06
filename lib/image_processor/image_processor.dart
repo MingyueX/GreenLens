@@ -32,7 +32,7 @@ class ImageProcessor implements ImageProcessorInterface {
 
   @override
   Future<Map<String, dynamic>> processImage(
-      BuildContext context, ImageRaw raw) async {
+      BuildContext context, ImageRaw raw, double focalLength) async {
     _showLoadingDialog(context);
     try {
       const MethodChannel _channel = MethodChannel('com.example.tree/torch_model');
@@ -42,6 +42,7 @@ class ImageProcessor implements ImageProcessorInterface {
         'depthArr': raw.arMat!.dBuffer,
         'depthWidth': raw.arWidth,
         'depthHeight': raw.arHeight,
+        'gamma': focalLength
       };
 
       final result = await _channel.invokeMethod('process_image', params);

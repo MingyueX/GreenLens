@@ -6,6 +6,8 @@ import numpy as np
 from scipy import stats
 import os
 import json
+from scipy.ndimage import rotate
+from sklearn.decomposition import PCA
 
 os.chdir(os.path.dirname(__file__))
 
@@ -880,42 +882,6 @@ def calculate_DBH(depth, best_lines):
     D = mode_depth / (GAMMA / dm_average - np.sqrt(0.25 - 25 / dm_average ** 2))
     return D
 
-def find_one_point_three_meter(depth, device_height):
-    ### Use depth to find the 1.3m position ###
-    GAMMA = 356.25
-    delta_h_depth = depth.copy()
-    # Divide by GAMMA to get the actual height represented by each pixel in the depth image
-    delta_h_depth = delta_h_depth / GAMMA
-    central_pixel_height = device_height
-    # Initialize the starting point for search
-    move_point = [180, 240]  # Assuming the format [row, column]
-    # Determine the relationship between central_pixel_height and 1.3m
-    # If central_pixel_height < 1.3m, search upwards in the image
-    if central_pixel_height < 1.3:
-        move_direction = 1  # Move upwards
-    else:
-        move_direction = -1  # Move downwards
-    move_range = [-1, 0, 1]  # Search range for the next point
-    height = central_pixel_height
-    while np.abs(height - 1.3) > 0.01:  # Until the height is approximately 1.3m
-        # Find the actual height of three pixels above the central_pixel, find the point closest to move_point in depth
-        delta_depth_list = []
-        for i in move_range:
-            delta_depth = np.abs(depth[move_point[0] - i, move_point[1]] - depth[move_point[0], move_point[1]])
-            delta_depth_list.append(delta_depth)
-        # Find the index of the minimum delta_depth in delta_depth_list
-        min_index = delta_depth_list.index(min(delta_depth_list))
-        # Update move_point
-        move_point[0] = move_point[0] - move_direction
-        move_point[1] = move_point[1] + move_range[min_index]
-        # Update height
-        height += delta_h_depth[move_point[0], move_point[1]] * move_direction
-        # Set the delta_h_depth at move_point to 0.2 for visualization (or marking), *seems like a typo, adjusted to 0.1 as per the comment
-        delta_h_depth[move_point[0], move_point[1]] = 0.1
-    # Swap x and y coordinates for move_point
-    move_point[0], move_point[1] = move_point[1], move_point[0]
-    return move_point
-
 def calculate_ratio_inside_box(extract_img):
     # Calculate the number of pixels within a 30*30 square
     count = 0
@@ -932,3 +898,271 @@ def fuse_line_with_bgr(canvans_with_lines,bgr):
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
     fuse_img = cv2.addWeighted(canvans_with_lines, 1, rgb, 1, 0)
     return fuse_img
+
+def prediction_preprocess(res):
+    """对于BBSNet输出结果进行预处理(去除干扰的成分)
+
+    Args:
+        res (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    # res = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+    # 取大于50的像素点
+    res[res < 50] = 0
+    # Relabel.
+    labeled = measure.label(res > 0, connectivity=1, background=0)
+    labels, counts = np.unique(labeled, return_counts=True)
+    # Omit the background.
+    if labels[0] == 0:
+        labels = labels[1:]
+        counts = counts[1:]
+    # If there was only background left, this is a bad image
+    if len(labels) == 0:
+        # raise NoTrunkFoundError
+        print("NoTrunkFoundError")
+    # Sort components by their distance from the mean of the target component
+    # This is the order in which we will remove them, if necessary.
+    # Find the mean x-value of each component:
+    means = np.zeros(labels.shape)
+    for l in labels:
+        xs = np.argwhere(labeled == l)[:, 1]
+        means[l - 1] = np.mean(xs)
+    # The target component is the largest component in the middle third
+    counts_temp = counts.copy()
+    target_component = labels[np.argmax(counts_temp)]
+    target_mean = means[target_component - 1]
+    # while (target_mean < 160) | (target_mean > 320):
+    #     # target_component选择为第二多的
+    #     counts_temp[np.argmax(counts_temp)] = 0
+    #     target_component = labels[np.argmax(counts_temp)]
+    #     target_mean = means[target_component - 1]
+    ####
+    diff_from_target = np.abs(means - target_mean)
+    sorted_inds = diff_from_target.argsort()
+    sorted_labels = labels[sorted_inds[::-1]]
+    inlier_area = np.sum(counts)
+    for i in range(len(sorted_labels) - 1):  # Must keep at least one component
+        # Check that the convex hull of the components is sufficiently dense in trunk inliers
+        # by examining the ratio of the pixel area in remaining components
+        # to the total area of the convex hull
+        # ConvexHull computed using http://www.qhull.org/
+        coords = np.argwhere(res > 0)
+        hull = spatial.ConvexHull(np.argwhere(res > 0))
+        hull_density = inlier_area / hull.volume
+        vertices = hull.vertices
+        points = coords[vertices].astype(np.int32)
+        points[:, [1, 0]] = points[:, [0, 1]]
+        average_height = np.mean(coords[:, 0])
+        if (hull_density > 0.9):
+            # return res
+            # print("hull density: ", hull_density)
+            break
+        else:
+            # If not, remove the component whose x-mean is furhest from the target component
+            remove = sorted_labels[i]
+            res[labeled == remove] = 0.0
+            labeled[labeled == remove] = 0
+            inlier_area = inlier_area - counts[remove - 1]
+    # binarize
+    _, res = cv2.threshold(res, 0, 255, cv2.THRESH_BINARY)
+    # 转为uint8类型
+    res = np.array(res, dtype=np.uint8)
+    contours, _ = cv2.findContours(res, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    small_contours = [cnt for cnt in contours if cv2.contourArea(cnt) < 400]
+    mask = np.zeros(res.shape, dtype=np.uint8) # 创建掩码
+    for cnt in small_contours:
+        # 获取轮廓边界点
+        cv2.fillPoly(mask, [cnt], (255))
+    # 与原图像进行按位或
+    res = cv2.bitwise_or(res, mask)
+    return res
+
+def get_rotate_angle(matrix):
+    """ Compute angle to rotate binary encoded image to vertical. """
+    x = np.array(np.where(matrix > 0)).T
+
+    # Perform a PCA and compute the angle of the first principal axes
+    pca = PCA(n_components=2).fit(x)
+
+    # Angle of the eigenvectors to the horizontal axis
+    # NOTE: numpy expects ([y-values], [x-values])
+    angles = np.arctan2(pca.components_[:,1], pca.components_[:,0])
+    angles = np.rad2deg(angles)
+
+    # We are using the eigenvector to define an axis,
+    # but adding 180 degrees identifies the same axis.
+    # Therefore, we restrict our angle to be between [0, 180]
+    # (The tree always points "up" though it may lean left or right.)
+    angles = np.mod(angles, 180)
+
+    # PCA returns two eigenvectors.
+    # In most cases, the first runs along the principal axis of the trunk.
+    # However, sometimes we get the perpendicular eigenvector.
+    # We assume that the tree is relatively upright,
+    # and the correct eigenvector is within 45 degrees of vertical.
+    # (See also Kour et al.)
+    if abs(90 - angles[0]) < 30:
+        angle = angles[0]
+    else:
+        angle = angles[1]
+
+    # Arctan returned an angle from the horizontal axis, but we are looking for
+    # the angle off the vertical axis
+    # (how far the image must be rotated to make the trunk vertical)
+    return 90 - angle
+
+def locate_boundary(res,pca_angle):
+    """返回左右边界的x坐标
+
+    Args:
+        res (_type_): _description_
+        pca_angle (_type_): _description_
+    """
+    PERCENT_INLIERS_HIGH = 0.60
+    PERCENT_INLIERS_LOW = 0.50
+    depth_filtered_mask = (res > 0) * 1
+    depth_filtered_mask_rotated = rotate(depth_filtered_mask * 1, pca_angle, reshape=False)
+    # 计算depth_filtered_mask_rotated上下点的纵向距离
+    img = depth_filtered_mask_rotated
+    first_row = 0
+    last_row = 0
+    for i in range(img.shape[0]):
+        col = img[i,:]
+        if np.any(col):
+            first_row = i
+            break
+    for i in range(img.shape[0]-1, -1, -1):
+        col = img[i,:]
+        if np.any(col):
+            last_row = i
+            break
+    # 计算两行之间的差值
+    diff = last_row - first_row
+    # depth_filtered_mask_rotated = (np.abs(depth_filtered_mask_rotated) > 0.003) * 1
+    # Move in from the left side until reaching a vertical scanline
+    # with at least PERCENT_INLIERS_HIGH percent of points in the filtered
+    # trunk range.
+    left_boundary = 0
+    for j in range(SHAPE[1]):
+        counts = np.bincount(depth_filtered_mask_rotated[:, j])
+        if len(counts) < 2:
+            continue
+        if counts[1] / diff > PERCENT_INLIERS_HIGH:
+            left_boundary = j
+            break
+    # Starting from the left boundary, move out to the left again until
+    # the first vertical scanline with less than PERCENT_INLIERS_LOW percent
+    # of points in the filtered trunk range. Choose the boundary just to the right.
+    for j in range(left_boundary - 1, -1, -1):
+        counts = np.bincount(depth_filtered_mask_rotated[:, j])
+        if len(counts) < 2:
+            continue
+        if counts[1] / diff < PERCENT_INLIERS_LOW:
+            left_boundary = j + 1
+            break
+
+    # Move in from the right side until reaching a vertical scanline
+    # with at least PERCENT_INLIERS_HIGH percent of points in the filtered
+    # trunk range.
+    right_boundary = 0
+    for j in range(SHAPE[1] - 1, -1, -1):
+        counts = np.bincount(depth_filtered_mask_rotated[:, j])
+        if len(counts) < 2:
+            continue
+        if counts[1] / diff > PERCENT_INLIERS_HIGH:
+            right_boundary = j
+            break
+
+    # Starting from the right boundary, move out to the right again until
+    # the first vertical scanline with less than PERCENT_INLIERS_LOW percent
+    # of points in the filtered trunk range. Choose the boundary just to the left.
+    for j in range(right_boundary, SHAPE[1]):
+        counts = np.bincount(depth_filtered_mask_rotated[:, j])
+        if len(counts) < 2:
+            continue
+        if counts[1] / diff < PERCENT_INLIERS_LOW:
+            right_boundary = j - 1
+            break
+    return left_boundary, right_boundary
+
+def get_rotated_boundary_canvas(left_boundary,right_boundary,pca_angle):
+    # 图中画出left_boundary和right_boundary
+    # 为left_boundary和right_boundary添加画框
+    canvans_left_boundary = np.zeros((360, 480), dtype=np.uint8)
+    canvans_right_boundary = np.zeros((360, 480), dtype=np.uint8)
+    # 画出左右边界线
+    canvans_left_boundary[:,left_boundary] = 255
+    canvans_right_boundary[:,right_boundary] = 255
+    # 旋转回去
+    canvans_left_boundary = rotate(canvans_left_boundary * 1, -pca_angle, reshape=False)
+    canvans_right_boundary = rotate(canvans_right_boundary * 1, -pca_angle, reshape=False)
+    # 延长边界线
+    # 获取左边界最上面的点和最下面的点的xy坐标
+    left_top_point = (0,0)
+    left_bottom_point = (0,0)
+    for i in range(canvans_left_boundary.shape[0]):
+        columns = np.where(canvans_left_boundary[i,:] > 0)[0]
+        if columns.size > 0:
+            left_top_point = (columns[0], i)
+            break
+    for i in range(canvans_left_boundary.shape[0] - 1, -1, -1):
+        columns = np.where(canvans_left_boundary[i,:] > 0)[0]
+        if columns.size > 0:
+            left_bottom_point = (columns[0], i)
+            break
+    line_left = (left_top_point[0], left_top_point[1], left_bottom_point[0], left_bottom_point[1])
+    #同理右边
+    right_top_point = (0,0)
+    right_bottom_point = (0,0)
+    for i in range(canvans_right_boundary.shape[0]):
+        columns = np.where(canvans_right_boundary[i,:] > 0)[0]
+        if columns.size > 0:
+            right_top_point = (columns[0], i)
+            break
+    for i in range(canvans_right_boundary.shape[0] - 1, -1, -1):
+        columns = np.where(canvans_right_boundary[i,:] > 0)[0]
+        if columns.size > 0:
+            right_bottom_point = (columns[0], i)
+            break
+    line_right = (right_top_point[0], right_top_point[1], right_bottom_point[0], right_bottom_point[1])
+    # 计算直线的斜率和截距
+    slope1, intercept1 = calculate_kandb(line_left)
+    slope2, intercept2 = calculate_kandb(line_right)
+    # 获取延长线的绘制点
+    new_x1, new_y1 ,new_x2, new_y2 = get_extend_line(slope1, intercept1)
+    new_x3, new_y3 ,new_x4, new_y4 = get_extend_line(slope2, intercept2)
+    ########### 左边
+    # 绘制从新端点到图像边界的直线
+    canvans_left = np.zeros((360, 480), dtype=np.uint8)
+    cv2.line(canvans_left, (new_x1, new_y1), (new_x2, new_y2), (255, 255, 255), 2)
+    canvans_right = np.zeros((360, 480), dtype=np.uint8)
+    cv2.line(canvans_right, (new_x3, new_y3), (new_x4, new_y4), (255, 255, 255), 2)
+    return canvans_left,canvans_right
+
+def get_single_line_meta(single_line_canvas):
+    contours, _ = cv2.findContours(single_line_canvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 提取轮廓中的最上面和最下面的点的坐标
+    topmost_point = tuple(contours[0][contours[0][:, :, 1].argmin()][0])
+    bottommost_point = tuple(contours[0][contours[0][:, :, 1].argmax()][0])
+    return (topmost_point, bottommost_point)
+
+def get_lines_meta(canvans_left,canvans_right):
+    # 提取左边界的metadata
+    left_line_meta = get_single_line_meta(canvans_left)
+    # 提取右边界的metadata
+    right_line_meta = get_single_line_meta(canvans_right)
+    # 写为一个json文件
+    line_info = {
+        "left_line": {
+            "top_yx": [int(left_line_meta[0][0]), int(left_line_meta[0][1])],
+            "bottom_yx": [int(left_line_meta[1][0]), int(left_line_meta[1][1])]
+        },
+        "right_line": {
+            "top_yx": [int(right_line_meta[0][0]), int(right_line_meta[0][1])],
+            "bottom_yx": [int(right_line_meta[1][0]), int(right_line_meta[1][1])]
+        }
+    }
+    line_info = json.dumps(line_info)
+    return line_info

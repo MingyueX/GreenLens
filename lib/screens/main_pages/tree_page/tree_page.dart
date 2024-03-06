@@ -1,3 +1,4 @@
+import 'package:GreenLens/base/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:GreenLens/base/widgets/app_bar.dart';
@@ -5,6 +6,7 @@ import 'package:GreenLens/screens/main_pages/tree_page/new_tree_collection.dart'
 import 'package:GreenLens/screens/main_pages/tree_page/tree_page_viewmodel.dart';
 import 'package:GreenLens/screens/main_pages/tree_page/widget/plot_list_options.dart';
 import 'package:GreenLens/theme/themes.dart';
+import 'package:provider/provider.dart';
 
 import '../../../base/custom_route.dart';
 import '../../../base/widgets/plain_button.dart';
@@ -14,6 +16,7 @@ import '../../page_navigation/page_nav_viewmodel.dart';
 import '../plot_page/new_plot_collection.dart';
 import '../plot_page/plot_page.dart';
 import '../plot_page/plot_page_viewmodel.dart';
+import '../profile_page/farmer_provider.dart';
 
 class TreePage extends StatelessWidget {
   const TreePage({Key? key}) : super(key: key);
@@ -26,6 +29,13 @@ class TreePage extends StatelessWidget {
     final plots = context.watch<PlotPageViewModel>().state.plots;
 
     int? currentPlot = viewModel.state.plotId;
+
+    Farmer? currentUser;
+    if (context.mounted) {
+      currentUser = Provider
+          .of<FarmerProvider>(context, listen: false)
+          .farmer;
+    }
 
     return Scaffold(
         appBar: CustomAppBar(
@@ -53,6 +63,7 @@ class TreePage extends StatelessWidget {
               } else {
                 Navigator.of(context, rootNavigator: true).push(
                     MaterialPageRoute(
+                        settings: const RouteSettings(name: "/treeCollectionPage"),
                         builder: (context) => const AddTreePage()));
               }
             },
@@ -110,6 +121,7 @@ class TreePage extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context, rootNavigator: true).push(
                               MaterialPageRoute(
+                                  settings: const RouteSettings(name: "/treeCollectionPage"),
                                   builder: (context) => const AddTreePage()));
                         },
                         buttonPrompt: "+ ADD TREE"));
@@ -123,7 +135,24 @@ class TreePage extends StatelessWidget {
                       itemBuilder: (BuildContext context, int index) {
                         return TreeItem(
                           tree: state.trees[index],
-                          onDelete: (tree) => viewModel.removeTree(tree),
+                          onDelete: (tree) {
+                            CustomDialog.show(context,
+                                message: "Delete this tree?",
+                                dialogType: DialogType.doubleButton,
+                                onConfirmed: () async {
+                                  await viewModel.removeTree(tree, currentUser?.participantId);
+                                  if (context.mounted) {
+                                    SnackBar snackBar = const SnackBar(
+                                      content: Text('Tree Deleted'),
+                                      duration: Duration(seconds: 1),
+                                    );
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
+                                    Navigator.of(context).pop();
+                                  }
+                                }
+                            );
+                          }
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) {
@@ -233,7 +262,12 @@ class TreeItem extends StatelessWidget {
                             tree.diameter?.toStringAsFixed(2) ?? "No diameter"),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                       GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                settings: const RouteSettings(name: "/treeCollectionPage"),
+                                    builder: (context) => AddTreePage(tree: tree)));
+                          },
                           child: const Icon(
                             Icons.edit,
                           )),

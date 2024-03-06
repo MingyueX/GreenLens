@@ -14,6 +14,7 @@ import 'package:ar_flutter_plugin/models/ar_hittest_result.dart';
 import 'package:ar_flutter_plugin/models/ar_image.dart';
 import 'package:ar_flutter_plugin/models/ar_node.dart';
 import 'package:ar_flutter_plugin/models/camera_image.dart';
+import 'package:ar_flutter_plugin/models/camera_intrinsics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -31,7 +32,9 @@ import '../../utils/exceptions.dart';
 import '../../utils/location.dart';
 
 class ImageCaptureScreen extends StatefulWidget {
-  const ImageCaptureScreen({Key? key}) : super(key: key);
+  final Function(String) onImgSaved;
+
+  const ImageCaptureScreen({Key? key, required this.onImgSaved}) : super(key: key);
 
   @override
   State<ImageCaptureScreen> createState() => _ImageCaptureScreenState();
@@ -142,7 +145,14 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+      return true;
+    }, child: Scaffold(
         body: WillPopScope(
       onWillPop: () async {
         await SystemChrome.setPreferredOrientations([
@@ -249,11 +259,33 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
                     accelerometerValues: _accelerometerValues,
                   );
                 },
-              )
+              ),
+            Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 10),
+                    child:
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child:
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.baseWhite,
+                            ),
+                            Text("Back", style: Theme.of(context).textTheme.labelLarge,)
+                          ],
+                        )
+                    )
+                )
+            )
           ],
         ),
       ),
-    ));
+    )));
   }
 
   // Future<void> onPlaneOrPointTapped(
@@ -449,6 +481,8 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
     _arSessionManager!.stopFetchingImages();
     CameraImage imgRGB = await _arSessionManager!.getCameraImage();
     ARImage arImage = await _arSessionManager!.getDepthImage();
+    CameraIntrinsics cameraIntrinsics = await _arSessionManager!.getCameraIntrinsics();
+    print("Camera Intrinsics: ${cameraIntrinsics.focalLengthX}");
 
     ImageRaw imageRaw = ImageRaw(
         rgbMat: imgRGB.bytes,
@@ -462,7 +496,7 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
     ImageResult? imageResult;
     if (mounted) {
       try {
-        final result = await imageProcessor.processImage(context, imageRaw);
+        final result = await imageProcessor.processImage(context, imageRaw, cameraIntrinsics.focalLengthX);
         imageResult = result['imageResult'];
         final diameter = result['diameter'];
         final lines = result['lineJson'];
@@ -470,13 +504,15 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen>
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
                 builder: (context) => CaptureConfirm(
+                  onImgSaved: widget.onImgSaved,
                       imageResult: imageResult!,
                       cameraImage: imgRGB,
                       // captureHeight: elevation!,
                       locations: _locations,
+                      focalLength: cameraIntrinsics.focalLengthX,
                       lineJson: lines,
-                      rawDepthArrays: arImage.rawDepthImgArrays,
-                      confidenceArrays: arImage.confidenceImgArrays,
+                      // rawDepthArrays: arImage.rawDepthImgArrays,
+                      // confidenceArrays: arImage.confidenceImgArrays,
                       diameter: diameter,
                     )),
             /*RawDepthTest(

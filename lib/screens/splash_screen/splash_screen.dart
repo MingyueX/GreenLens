@@ -34,14 +34,17 @@ class SplashScreen extends StatelessWidget {
             WidgetsBinding.instance!.addPostFrameCallback((_) async {
               await Provider.of<FarmerProvider>(context, listen: false)
                   .setFarmer(state.farmer);
-              if (context.mounted) {
-                await context
-                    .read<PlotPageViewModel>()
-                    .setFarmer(state.farmer.participantId);
-              }
+              // if (context.mounted) {
+              //   await context
+              //       .read<PlotPageViewModel>()
+              //       .setFarmer(state.farmer.participantId);
+              // }
               if (context.mounted) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const TabbedPage()));
+                await context
+                    .read<PlotPageViewModel>()
+                    .setFarmer(state.farmer.participantId);
               }
             });
           }

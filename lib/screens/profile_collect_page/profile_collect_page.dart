@@ -3,7 +3,6 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:GreenLens/base/widgets/confirm_button.dart';
-import 'package:GreenLens/base/widgets/shortcut_to_capture.dart';
 import 'package:GreenLens/screens/main_pages/profile_page/farmer_provider.dart';
 import 'package:GreenLens/screens/page_navigation/page_navigation.dart';
 import 'package:GreenLens/services/storage/db_service.dart';
@@ -33,7 +32,6 @@ class _ProfileCollectPageState extends State<ProfileCollectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: const ShortCutButton(),
         body: GradientBg(
             child: Center(
                 child: SingleChildScrollView(
@@ -136,9 +134,7 @@ class _ProfileCollectPageState extends State<ProfileCollectPage> {
                           final dbService = DatabaseService();
                           final existFarmer = await dbService.searchFarmer(farmer.participantId);
                           if (existFarmer != null) {
-                            WidgetsBinding.instance!.addPostFrameCallback((_) async {
-                              await Provider.of<FarmerProvider>(context, listen: false)
-                                  .setFarmer(existFarmer);
+                            WidgetsBinding.instance.addPostFrameCallback((_) async {
                               if (context.mounted) {
                                 await context
                                     .read<PlotPageViewModel>()

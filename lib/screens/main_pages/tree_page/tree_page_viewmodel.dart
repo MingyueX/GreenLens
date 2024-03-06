@@ -2,13 +2,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:GreenLens/model/models.dart';
 
 import '../../../services/storage/db_service.dart';
+import '../../../utils/file_storage.dart';
 
 class TreesState {
 
   final List<Tree> trees;
   int? plotId;
+  int? treeId;
 
-  TreesState(this.trees, {this.plotId});
+  TreesState(this.trees, {this.plotId, this.treeId});
 }
 
 class TreePageViewModel extends Cubit<TreesState> {
@@ -21,18 +23,29 @@ class TreePageViewModel extends Cubit<TreesState> {
       emit(TreesState([], plotId: null));
       return;
     }
-    List<Tree> updatedTrees = await dbService.searchTreeByPlotId(plotId);
+    List<Tree> updatedTrees = await dbService.searchValidTreeByPlotId(plotId);
     emit(TreesState(updatedTrees, plotId: plotId));
   }
 
-  Future<void> addTree(Tree tree) async {
-    await dbService.insertTree(tree);
-    List<Tree> updatedTrees = await dbService.searchTreeByPlotId(tree.plotId);
+  Future<int> addTree(Tree tree) async {
+    final treeId = await dbService.insertTree(tree);
+    List<Tree> updatedTrees = await dbService.searchValidTreeByPlotId(tree.plotId);
+    emit(TreesState(updatedTrees, plotId: tree.plotId, treeId: treeId));
+    return treeId;
+  }
+
+  Future<void> removeTree(Tree tree, int? farmerId) async {
+    await dbService.markTreeAsInvalid(tree.id!);
+    String basePath = await FileStorage.getBasePath();
+    String path = '$basePath/Participant#${farmerId == null ? "unknown" : "$farmerId"}/Plot#${tree.plotId}/Tree#${tree.id}${tree.uid == null ? "" : "_${tree.uid}"}';
+    await FileStorage.deleteDirectory(path);
+    List<Tree> updatedTrees = await dbService.searchValidTreeByPlotId(tree.plotId);
     emit(TreesState(updatedTrees, plotId: tree.plotId));
   }
 
-  Future<void> removeTree(Tree tree) async {
-    await dbService.deleteTreeById(tree.id!);
-    emit(TreesState([...state.trees]..remove(tree), plotId: tree.plotId));
+  Future<void> updateTree(Tree tree) async {
+    await dbService.updateTree(tree);
+    List<Tree> updatedTrees = await dbService.searchValidTreeByPlotId(tree.plotId);
+    emit(TreesState(updatedTrees, plotId: tree.plotId));
   }
 }

@@ -11,7 +11,9 @@ import '../../../../base/widgets/confirm_button.dart';
 import '../../../../model/models.dart';
 
 class PlotCollectCard extends StatefulWidget {
-  const PlotCollectCard({Key? key}) : super(key: key);
+  const PlotCollectCard({Key? key, this.plot}) : super(key: key);
+
+  final Plot? plot;
 
   @override
   State<PlotCollectCard> createState() => _PlotCollectCardState();
@@ -21,6 +23,7 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
   bool isHarvesting = false;
   bool isThinning = false;
   LandUse? selectedLandUse = LandUse.water;
+  final TextEditingController _plotIdController = TextEditingController();
   // final TextEditingController _clusterIdController = TextEditingController();
   // final TextEditingController _groupIdController = TextEditingController();
   // final TextEditingController _farmIdController = TextEditingController();
@@ -28,6 +31,17 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
   final _formKey = GlobalKey<FormState>();
 
   static const double spacing = 15;
+
+  @override
+  void initState() {
+    if (widget.plot != null) {
+      isHarvesting = widget.plot!.harvesting;
+      isThinning = widget.plot!.thinning;
+      selectedLandUse = LandUse.fromString(widget.plot!.dominantLandUse);
+      _plotIdController.text = widget.plot!.uid != null ? widget.plot!.uid.toString() : "";
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +135,40 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
               //   ],
               // ),
               const SizedBox(height: spacing),
+              SizedBox(
+                  width: 60,
+                  child:
+                  PlatformTextFormField(
+                    controller: _plotIdController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.start,
+                    material: (_, __) => MaterialTextFormFieldData(
+                      decoration: const InputDecoration(
+                        labelText: "ID",
+                      ),
+                    ),
+                  )),
+              // Row(
+              //     crossAxisAlignment: CrossAxisAlignment.center,
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text("Id",
+              //           style: Theme.of(context).textTheme.headlineMedium),
+              //       Container(
+              //           width: 195,
+              //           height: 25,
+              //           child: TextField(
+              //             controller: _plotIdController,
+              //             keyboardType: TextInputType.number,
+              //             decoration: const InputDecoration(
+              //               border: OutlineInputBorder(
+              //                   borderSide: BorderSide(color: AppColors.grey)),
+              //               enabledBorder: OutlineInputBorder(
+              //                   borderSide: BorderSide(color: AppColors.grey)),
+              //               focusedBorder: OutlineInputBorder(
+              //                   borderSide: BorderSide(color: AppColors.grey)),
+              //             ),))]),
+              const SizedBox(height: spacing),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text("Harvesting in progress?",
                     style: Theme.of(context).textTheme.headlineMedium),
@@ -172,7 +220,7 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
                 }).toList(),
               ),
               ConfirmButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState == null ||
                       !_formKey.currentState!.validate()) {
                     return;
@@ -185,16 +233,23 @@ class _PlotCollectCardState extends State<PlotCollectCard> {
                       // clusterId: int.parse(_clusterIdController.text),
                       // groupId: int.parse(_groupIdController.text),
                       // farmId: int.parse(_farmIdController.text),
-                      clusterId: 1,
-                      groupId: 1,
-                      farmId: 1,
+                    id: widget.plot?.id,
+                      uid: _plotIdController.text.isEmpty ? null : int.parse(_plotIdController.text),
                       harvesting: isHarvesting,
                       thinning: isThinning,
                       dominantLandUse: selectedLandUse!.name,
                       date: DateTime.now(),
                       farmerId: farmerId);
-                  viewModel.addPlot(plot);
-                  Navigator.pop(context);
+                  // user is editing
+                  if (widget.plot != null) {
+                    await viewModel.updatePlot(plot);
+                  }
+                  else {
+                    await viewModel.addPlot(plot);
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 },
                 buttonPrompt: "Save",
               ),

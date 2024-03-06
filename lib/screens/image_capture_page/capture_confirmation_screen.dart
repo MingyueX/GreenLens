@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:GreenLens/screens/image_capture_page/optimize_with_parallel.dart';
 import 'package:ar_flutter_plugin/models/camera_image.dart';
 import 'package:ar_flutter_plugin/models/depth_img_array.dart';
 import 'package:flutter/material.dart';
@@ -13,34 +16,38 @@ import 'dart:ui' as ui;
 import '../../base/widgets/toast_like_msg.dart';
 import '../../model/models.dart';
 import '../../services/cloud/cloud_storage.dart';
+import '../../utils/image_util.dart';
 import '../main_pages/profile_page/farmer_provider.dart';
 
 class CaptureConfirm extends StatelessWidget {
+
   CaptureConfirm(
       {Key? key,
+      required this.onImgSaved,
       required this.imageResult,
       required this.cameraImage,
-      // required this.captureHeight,
-      required this.rawDepthArrays,
-      required this.confidenceArrays,
+      required this.focalLength,
+      // required this.rawDepthArrays,
+      // required this.confidenceArrays,
       required this.locations,
       required this.lineJson,
       required this.diameter})
       : super(key: key);
 
+  final Function(String) onImgSaved;
   final ImageResult imageResult;
   final CameraImage cameraImage;
-  // final double captureHeight;
-  final DepthImgArrays? rawDepthArrays;
-  final DepthImgArrays? confidenceArrays;
+  final double focalLength;
+  // final DepthImgArrays? rawDepthArrays;
+  // final DepthImgArrays? confidenceArrays;
   final List<Position> locations;
   final double diameter;
   final String lineJson;
 
-  final CloudStorage cloudStorage = CloudStorage();
-
   @override
   Widget build(BuildContext context) {
+    final screenH = MediaQuery.of(context).size.height;
+    final screenW = MediaQuery.of(context).size.width;
     return WillPopScope(
         onWillPop: () async {
           await SystemChrome.setPreferredOrientations([
@@ -68,31 +75,30 @@ class CaptureConfirm extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                              builder: (context) => const ImageCaptureScreen(),
+                              builder: (context) => ImageCaptureScreen(onImgSaved: onImgSaved),
                             ),
                           );
                         },
                         child: const Text("Re-capture"),
                       ),
-                      // ElevatedButton(
-                      //   onPressed: () async {
-                      //     ui.Image image = await ImageUtil.bytesToUiImage(
-                      //         cameraImage.bytes!);
-                      //     if (context.mounted) {
-                      //       Navigator.of(context).push(
-                      //         MaterialPageRoute(
-                      //           builder: (context) => Scaffold(
-                      //             body: DraggableImagePainter(
-                      //               image: image,
-                      //               cameraImage: cameraImage,
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       );
-                      //     }
-                      //   },
-                      //   child: const Text("Optimize"),
-                      // ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          ui.Image image = await ImageUtil.bytesToUiImage(
+                              cameraImage.bytes!);
+                          if (context.mounted) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => Scaffold(
+                                  body: InteractiveLinesWidget(
+                                    image: image, cameraImage: cameraImage, linesJson: json.decode(lineJson), imageResult: imageResult, focalLength: focalLength, onImgSaved: onImgSaved,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text("Optimize"),
+                      ),
                       Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text("DBH: ${diameter.toStringAsFixed(2)}",
@@ -104,81 +110,22 @@ class CaptureConfirm extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: 20, left: 20, right: 20),
                     child: ToastLikeMsg(
                         msg:
-                        "Please retake when the lines don’t fit well with the edges."))),
+                        "Please retake/optimize when the lines don’t fit well with the edges."))),
             Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: () async {
-                    Uint8List imageBytes = imageResult.rgbImage!;
-                    Farmer currentUser = Provider
-                        .of<FarmerProvider>(context, listen: false)
-                        .farmer;
-                    String fileName = await CloudStorage.getFileName();
-                    String path = "image/${currentUser == null ? "unknown" : "#${currentUser.participantId}_${currentUser.name}/"}diameter_capture/";
-                    String result = await cloudStorage.uploadImage(imageBytes, fileName, path);
-                    if (result.isNotEmpty) {
+                    onImgSaved(imageResult.diameter.toStringAsFixed(2));
                       WidgetsBinding.instance.addPostFrameCallback((_) {
+                        SystemChrome.setPreferredOrientations([
+                          DeviceOrientation.portraitUp,
+                          DeviceOrientation.portraitDown,
+                        ]);
                         if (context.mounted) {
                           Provider.of<ImgResultProvider>(context, listen: false).imageResult = imageResult;
-                          Provider.of<ImgResultProvider>(context, listen: false).cloudImageUrl = result;
-                          Navigator.of(context).maybePop();
+                          Navigator.of(context).popUntil(ModalRoute.withName("/treeCollectionPage"));
                         }
                       });
-                    }
-
-
-
-                    // final String? userInput = await showDialog<String>(
-                    //   context: context,
-                    //   builder: (BuildContext context) {
-                    //     TextEditingController controller =
-                    //         TextEditingController();
-                    //     return AlertDialog(
-                    //       title: Text("Enter a number"),
-                    //       content: TextField(
-                    //         controller: controller,
-                    //         keyboardType: TextInputType.number,
-                    //         decoration:
-                    //             InputDecoration(hintText: "Enter a number"),
-                    //       ),
-                    //       actions: [
-                    //         TextButton(
-                    //           child: Text("Cancel"),
-                    //           onPressed: () {
-                    //             Navigator.of(context).pop(); // close the dialog
-                    //           },
-                    //         ),
-                    //         TextButton(
-                    //           child: Text("OK"),
-                    //           onPressed: () {
-                    //             Navigator.of(context).pop(controller
-                    //                 .text); // close the dialog and return the input value
-                    //           },
-                    //         ),
-                    //       ],
-                    //     );
-                    //   },
-                    // );
-
-                    // FileStorage.saveToFileResults(
-                    //     // elevation: captureHeight,
-                    //     estDiameter: diameter,
-                    //     image: cameraImage.bytes!,
-                    //     arrays: imageResult.depthImage!,
-                    //     rawDepthArrays: rawDepthArrays,
-                    //     confidenceArrays: confidenceArrays);
-
-                    // if (userInput != null &&
-                    //     userInput.isNotEmpty &&
-                    //     context.mounted) {
-                    //   FileStorage.saveToFileResults(
-                    //       elevation: captureHeight,
-                    //       image: cameraImage.bytes!,
-                    //       arrays: imageResult.depthImage!,
-                    //       rawDepthArrays: rawDepthArrays,
-                    //       confidenceArrays: confidenceArrays,
-                    //       groundTruth: userInput);
-
                   },
                   child: const Text("Save"),
                 ))

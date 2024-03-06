@@ -14,10 +14,12 @@ class TreeTable extends Table {
   TextColumn get condition => text().named('condition')();
   TextColumn get detail => text().named('detail').nullable()();
   TextColumn get causeOfDeath => text().named('cause_of_death').nullable()();
+  TextColumn get physicalMechanism => text().named('physical_mechanism').nullable()();
+  TextColumn get numTreesInMortality => text().named('num_trees_in_mortality').nullable()();
+  TextColumn get killProcess => text().named('kill_process').nullable()();
   RealColumn get age => real().named('age').nullable()();
-  TextColumn get diameterUrl => text().named('diameter_url').nullable()();
   TextColumn get species => text().named('species').nullable()();
-  TextColumn get speciesUrl => text().named('species_url').nullable()();
   TextColumn get locationsJson => text().named('locations_json').nullable()();
   TextColumn get lineJson => text().named('line_json').nullable()();
+  BoolColumn get isValid => boolean().named('is_valid').withDefault(Constant(true))();
 }

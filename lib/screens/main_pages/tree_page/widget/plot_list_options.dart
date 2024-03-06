@@ -26,6 +26,7 @@ class PlotListOptions extends StatelessWidget {
               "Choose any plot to view tree data"
               : "No plots yet",
               style: Theme.of(context).textTheme.bodySmall),
+          Expanded(child:
           ListView.separated(
             itemCount: plots.length,
             itemBuilder: (context, index) {
@@ -42,7 +43,7 @@ class PlotListOptions extends StatelessWidget {
             separatorBuilder: (BuildContext context, int index) {
               return const Divider();
             },
-          )
+          ))
         ])));
   }
 }

@@ -9,7 +9,7 @@ class DatabaseService {
 
   Future<void> insertPlot(Plot plot) => db.insertPlot(plot);
 
-  Future<void> insertTree(Tree tree) => db.insertTree(tree);
+  Future<int> insertTree(Tree tree) => db.insertTree(tree);
 
   Future<void> insertAllPlot(List<Plot> plots) => db.insertAllPlot(plots);
 
@@ -17,27 +17,23 @@ class DatabaseService {
 
   Future<Farmer?> searchFarmer(int id) => db.searchFarmer(id);
 
-  Future<Plot?> searchPlotById(int id) => db.searchPlotById(id);
+  Future<Plot?> searchValidPlotById(int id) => db.searchValidPlotById(id);
 
-  Future<List<Plot>> searchPlotByFarmerId(int id) => db.searchPlotByFarmerId(id);
-
-  Future<List<Plot>> searchPlotByClusterId(int id) => db.searchPlotByClusterId(id);
+  Future<List<Plot>> searchValidPlotByFarmerId(int id) => db.searchValidPlotByFarmerId(id);
 
   Future<List<PlotWithTrees>> fetchPlotsWithTrees(int id) => db.fetchPlotsWithTrees(id);
 
-  Future<Tree?> searchTreeById(int id) => db.searchTreeById(id);
+  Future<Tree?> searchValidTreeById(int id) => db.searchValidTreeById(id);
 
-  Future<List<Tree>> searchTreeByPlotId(int id) => db.searchTreeByPlotId(id);
-
-  Future<List<Tree>> searchTreeBySpeciesId(int id) => db.searchTreeBySpeciesId(id);
-
-  Future<List<Tree>> searchTreeByTreeCondition(TreeCondition cond) => db.searchTreeByTreeCondition(cond);
-
-  Future<List<Tree>> searchTreeByDiameter(int minDiameter, int maxDiameter) => db.searchTreeByDiameter(minDiameter, maxDiameter);
+  Future<List<Tree>> searchValidTreeByPlotId(int id) => db.searchValidTreeByPlotId(id);
 
   Future<void> updatePlot(Plot plot) => db.updatePlot(plot);
 
   Future<void> updateTree(Tree tree) => db.updateTree(tree);
+
+  Future<void> markPlotAsInvalid(int plotId) => db.markPlotAsInvalid(plotId);
+
+  Future<void> markTreeAsInvalid(int treeId) => db.markTreeAsInvalid(treeId);
 
   Future<void> deletePlot(Plot plot) => db.deletePlot(plot);
 

@@ -25,7 +25,7 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
           prefs.remove("lastFarmer");
           emit(DataLoadedNewUser());
         } else {
-          final plots = await dbService.searchPlotByFarmerId(participantID);
+          final plots = await dbService.searchValidPlotByFarmerId(participantID);
           emit(DataLoadedExistUser(farmer: farmer!, plots: plots));
         }
       } else {
@@ -34,6 +34,7 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
     } on StateError catch (e) {
       print(e);
     } on Exception catch (e) {
+      print(e);
       emit(DataError(e as Exception));
     }
   }

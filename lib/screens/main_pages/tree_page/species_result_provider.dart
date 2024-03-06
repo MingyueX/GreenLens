@@ -1,14 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 
 class SpeciesResultProvider extends ChangeNotifier {
   String? speciesName;
-  String? imgUrl;
+  Uint8List? _speciesImage;
 
   String? get name => speciesName;
-  String? get imageUrl => imgUrl;
+  Uint8List? get speciesImage => _speciesImage;
 
-  set imageUrl(String? imageUrl) {
-    imgUrl = imageUrl;
+  set speciesImage(Uint8List? value) {
+    _speciesImage = value;
     notifyListeners();
   }
 
@@ -19,7 +21,7 @@ class SpeciesResultProvider extends ChangeNotifier {
 
   void clear() {
     speciesName = null;
-    // imgUrl = null;
+    _speciesImage = null;
     notifyListeners();
   }
 }

@@ -10,30 +10,35 @@ class Farmer {
 
 class Plot {
   final int? id;
+  final int? uid;
   final int farmerId;
-  final int clusterId;
-  final int groupId;
-  final int farmId;
+  // final int clusterId;
+  // final int groupId;
+  // final int farmId;
   final DateTime date;
   final bool harvesting;
   final bool thinning;
   final String dominantLandUse;
+  final bool isValid;
+
 
   Plot({
     this.id,
+    this.uid,
     required this.farmerId,
-    required this.clusterId,
-    required this.groupId,
-    required this.farmId,
+    // required this.clusterId,
+    // required this.groupId,
+    // required this.farmId,
     required this.date,
     required this.harvesting,
     required this.thinning,
     required this.dominantLandUse,
+    this.isValid = true,
   });
 
   @override
   String toString() {
-    return 'Plot{id: $id, farmerId: $farmerId, clusterId: $clusterId, groupId: $groupId, farmId: $farmId, date: $date, harvesting: $harvesting, thinning: $thinning, dominantLandUse: $dominantLandUse}';
+    return 'Plot{id: $id, farmerId: $farmerId, date: $date, harvesting: $harvesting, thinning: $thinning, dominantLandUse: $dominantLandUse}';
   }
 }
 
@@ -67,6 +72,13 @@ enum LandUse {
         return "Other";
     }
   }
+
+  static LandUse fromString(String str) {
+    return LandUse.values.firstWhere(
+          (e) => e.name == str,
+      orElse: () => throw Exception("This LandUse does not exist"),
+    );
+  }
 }
 
 class Tree {
@@ -83,12 +95,14 @@ class Tree {
   TreeCondition condition;
   TreeAliveCondition? conditionDetail;
   String? causeOfDeath;
+  PhysicalMechanism? physicalMechanism;
+  NumTreesInMortality? numTreesInMortality;
+  KillProcess? killProcess;
   double? age;
-  String? diameterUrl;
   String? species;
-  String? speciesUrl;
   String? lineJson; // line of trunk edges
   String? locationsJson; // List of locations when user is capturing diameter
+  bool isValid;
 
   Tree({
     this.id,
@@ -104,13 +118,20 @@ class Tree {
     required this.condition,
     this.conditionDetail,
     this.causeOfDeath,
+    this.physicalMechanism,
+    this.numTreesInMortality,
+    this.killProcess,
     this.age,
-    this.diameterUrl,
     this.species,
-    this.speciesUrl,
     this.locationsJson,
-    this.lineJson
+    this.lineJson,
+    this.isValid = true,
   });
+
+  @override
+  String toString() {
+    return 'Tree{id: $id, plotId: $plotId, diameter: $diameter, locationLatitude: $locationLatitude, locationLongitude: $locationLongitude, orientation: $orientation, speciesId: $speciesId, isEucalyptus: $isEucalyptus, condition: $condition, conditionDetail: $conditionDetail, causeOfDeath: $causeOfDeath, physicalMechanism: $physicalMechanism, numTreesInMortality: $numTreesInMortality, killProcess: $killProcess, age: $age, species: $species, lineJson: $lineJson, locationsJson: $locationsJson, isValid: $isValid}';
+  }
 }
 
 enum TreeCondition {
@@ -195,6 +216,16 @@ enum PhysicalMechanism {
   final String statusCode;
 
   const PhysicalMechanism(this.detail, this.statusCode);
+
+  static PhysicalMechanism? fromString(String? str) {
+    if (str == null) {
+      return null;
+    }
+    return PhysicalMechanism.values.firstWhere(
+          (e) => e.statusCode == str,
+      orElse: () => throw Exception("This mechanism does not exist"),
+    );
+  }
 }
 
 enum NumTreesInMortality {
@@ -206,6 +237,16 @@ enum NumTreesInMortality {
   final String statusCode;
 
   const NumTreesInMortality(this.detail, this.statusCode);
+
+  static NumTreesInMortality? fromString(String? str) {
+    if (str == null) {
+      return null;
+    }
+    return NumTreesInMortality.values.firstWhere(
+          (e) => e.statusCode == str,
+      orElse: () => throw Exception("This does not exist"),
+    );
+  }
 }
 
 enum KillProcess {
@@ -231,6 +272,16 @@ enum KillProcess {
   final String statusCode;
 
   const KillProcess(this.detail, this.statusCode);
+
+  static KillProcess? fromString(String? str) {
+    if (str == null) {
+      return null;
+    }
+    return KillProcess.values.firstWhere(
+          (e) => e.statusCode == str,
+      orElse: () => throw Exception("This process does not exist"),
+    );
+  }
 }
 
 class PlotWithTrees {

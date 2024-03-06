@@ -8,6 +8,9 @@ import io.flutter.plugin.common.MethodChannel
 import com.chaquo.python.PyException
 import com.google.ar.core.ArCoreApk
 import android.os.Handler
+import android.content.Intent
+import android.net.Uri
+
 
 class MainActivity : FlutterActivity() {
     private var mUserRequestedInstall = true
@@ -15,6 +18,7 @@ class MainActivity : FlutterActivity() {
     companion object {
         private const val CHANNEL = "com.example.tree/torch_model"
         private const val ARCORE_CHANNEL = "com.example.tree/arcore"
+        private const val SYS_CHANNEL = "com.example.tree/sys"
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
@@ -32,7 +36,25 @@ class MainActivity : FlutterActivity() {
                         val depthArr = call.argument<List<Double>>("depthArr")!!
                         val depthWidth = call.argument<Int>("depthWidth")!!
                         val depthHeight = call.argument<Int>("depthHeight")!!
-                        val res = processor.processImage(rgbMat, depthArr, depthWidth, depthHeight)
+                        val focalLength = call.argument<Double>("focalLength")
+                        val res = processor.processImage(rgbMat, depthArr, depthWidth, depthHeight,focalLength)
+                        result.success(res)
+                    } catch (e: PyException) {
+                        val (errorType, errorMessage) = e.message?.split(":", limit = 2) ?: listOf("UnknownError", e.message ?: "Unknown Message")
+                        Log.d("MainActivity", "Error: $errorType, $errorMessage")
+                        result.error(errorType.trim(), errorMessage?.trim(), e.stackTrace.joinToString("\n"))
+                    }
+                }
+                "process_after_adjust" -> {
+                    try {
+                        val processor = ImageProcessor(this@MainActivity)
+                        val depthArr = call.argument<List<Double>>("depthArr")!!
+                        val m1 = call.argument<Double>("m1")!!
+                        val n1 = call.argument<Double>("n1")!!
+                        val m2 = call.argument<Double>("m2")!!
+                        val n2 = call.argument<Double>("n2")!!
+                        val focalLength = call.argument<Double>("focalLength")
+                        val res = processor.processAfterAdjustment(depthArr, m1, n1, m2, n2, focalLength)
                         result.success(res)
                     } catch (e: PyException) {
                         val (errorType, errorMessage) = e.message?.split(":", limit = 2) ?: listOf("UnknownError", e.message ?: "Unknown Message")
@@ -52,6 +74,25 @@ class MainActivity : FlutterActivity() {
                 }
                 "arcore_installation" -> {
                     arcoreInstall(result)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SYS_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "open_file_explorer" -> {
+                    val path = call.argument<String>("path")
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    // Correct way to initialize a Uri object in Kotlin
+                    val uri: Uri = Uri.parse(path)
+                    intent.setDataAndType(uri, "resource/folder")
+                    if (intent.resolveActivityInfo(packageManager, 0) != null) {
+                        startActivity(intent)
+                    } else {
+                        // It's a good idea to handle the case where no activity can handle your intent
+                        result.error("NO_ACTIVITY_FOUND", "No Activity found to handle the intent", null)
+                    }
                 }
                 else -> result.notImplemented()
             }

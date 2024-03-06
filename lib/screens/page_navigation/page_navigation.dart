@@ -52,7 +52,6 @@ class _TabbedPageState extends State<TabbedPage>
           _tabController.animateTo(index); // Update the tab controller's index.
         }
         return Scaffold(
-          floatingActionButton: const ShortCutButton(),
           backgroundColor: AppColors.baseWhite,
           body: IndexedStack(
               index: MainPage.values.indexOf(state.currentPage),

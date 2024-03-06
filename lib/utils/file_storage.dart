@@ -40,7 +40,8 @@ class FileStorage {
   static Future<String> getBasePath() async {
     try {
       final directory = await getExternalStorageDirectory();
-      final filePath = '${directory!.path}/Trees';
+      // final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory?.path}/GreenLens';
       return filePath;
     } catch (e) {
       throw Exception(e);
@@ -146,5 +147,27 @@ class FileStorage {
     await saveDepthImgDataToFile(
         treeId, confidenceArrays, targetPathConfidenceImgData);
     // await saveToFileGroundTruth(treeId, groundTruth, targetPathGroundTruth);
+  }
+
+  static Future<void> deleteFile(String path) async {
+    final file = File(path);
+    try {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  static Future<void> deleteDirectory(String path) async {
+    final directory = Directory(path);
+    try {
+      if (await directory.exists()) {
+        await directory.delete(recursive: true);
+      }
+    } catch (e) {
+      print('Error deleting directory: $e');
+    }
   }
 }

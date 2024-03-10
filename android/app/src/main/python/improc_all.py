@@ -93,6 +93,7 @@ def run(output_array, gt_width, gt_height, GAMMA = 371.25):
     rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
     result = cv2.addWeighted(canvans_right, 1, canvans_left, 1, 0)
     result = cv2.addWeighted(rgb, 1, result, 1, 0)
+    result = cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
     # convert the image to base64
     img_base64 = numpy_array_to_base64(result)
 

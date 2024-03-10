@@ -1,3 +1,4 @@
+import 'package:GreenLens/base/widgets/shortcut_to_improc.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,6 +61,7 @@ class _TabbedPageState extends State<TabbedPage>
                       onGenerateRoute: (settings) =>
                           MaterialPageRoute(builder: (_) => page)))
                   .toList()),
+          floatingActionButton: ShortCutButton(),
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(color: AppColors.primaryGreen),
             child: TabBar(

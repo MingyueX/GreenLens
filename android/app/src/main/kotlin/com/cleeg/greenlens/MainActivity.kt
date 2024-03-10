@@ -45,6 +45,19 @@ class MainActivity : FlutterActivity() {
                         result.error(errorType.trim(), errorMessage?.trim(), e.stackTrace.joinToString("\n"))
                     }
                 }
+                "process_image_debug" -> {
+                    try {
+                        val processor = ImageProcessor(this@MainActivity)
+                        val rgbMat = call.argument<ByteArray>("rgbMat")!!
+                        val depthArr = call.argument<List<Double>>("depthArr")!!
+                        val res = processor.processImageDebug(rgbMat, depthArr, 160, 120)
+                        result.success(res)
+                    } catch (e: PyException) {
+                        val (errorType, errorMessage) = e.message?.split(":", limit = 2) ?: listOf("UnknownError", e.message ?: "Unknown Message")
+                        Log.d("MainActivity", "Error: $errorType, $errorMessage")
+                        result.error(errorType.trim(), errorMessage?.trim(), e.stackTrace.joinToString("\n"))
+                    }
+                }
                 "process_after_adjust" -> {
                     try {
                         val processor = ImageProcessor(this@MainActivity)

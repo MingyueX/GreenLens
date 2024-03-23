@@ -22,6 +22,8 @@ import 'map/map_download_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+
   await FlutterMapTileCaching.initialise();
   await FMTC.instance('mapStore').manage.createAsync();
 

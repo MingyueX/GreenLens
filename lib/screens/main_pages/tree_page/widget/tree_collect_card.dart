@@ -5,6 +5,7 @@ import 'package:GreenLens/screens/species_identify/camera_page.dart';
 import 'package:ar_flutter_plugin/models/depth_img_array.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bmflocation/flutter_bmflocation.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -66,9 +67,27 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final myLocPlugin = LocationFlutterPlugin();
+
   @override
   void initState() {
-    _getLocation();
+
+    myLocPlugin.setAgreePrivacy(true);
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      PermissionStatus status = await Permission.locationWhenInUse.status;
+
+      if (status.isDenied || status.isRestricted || status.isPermanentlyDenied) {
+        // Request permission
+        status = await Permission.locationWhenInUse.request();
+      }
+
+      if (status.isGranted) {
+        await _getLocation();
+      }
+    });
+
+    // _getLocation();
     if (widget.tree != null) {
       isEucalyptus = widget.tree!.isEucalyptus;
       _diameterController.text = widget.tree!.diameter != null ? widget.tree!.diameter.toString() : "";
@@ -89,20 +108,63 @@ class _TreeCollectCardState extends State<TreeCollectCard> {
     super.initState();
   }
 
+  BaiduLocationAndroidOption initAndroidOptions() {
+    BaiduLocationAndroidOption options =
+    BaiduLocationAndroidOption(
+    locationMode: BMFLocationMode.hightAccuracy,
+// 坐标系
+    coordType: BMFLocationCoordType.bd09ll,
+// 设置发起定位请求的间隔，int类型，单位ms
+// 如果设置为0，则代表单次定位，即仅定位一次，默认为0
+    scanspan: 0);
+    return options;
+  }
+
+  BaiduLocationIOSOption initIOSOptions() {
+    BaiduLocationIOSOption options =
+    BaiduLocationIOSOption(
+        coordType: BMFLocationCoordType.bd09ll,
+    );
+    return options;
+  }
+
   _getLocation() async {
-    LocationUtil.getLocation().then((value) {
-      if (value != null) {
-        _latController.text = value.latitude.toStringAsFixed(2);
-        _longController.text = value.longitude.toStringAsFixed(2);
+    print("Getting location");
+    Map iosMap = initIOSOptions().getMap();
+    Map androidMap = initAndroidOptions().getMap();
+
+    await myLocPlugin.prepareLoc(androidMap, iosMap);
+
+    await myLocPlugin.startLocation();
+
+    myLocPlugin.singleLocationCallback(callback: (BaiduLocation result) {
+      print("Location: ${result.longitude}, ${result.latitude}");
+      if (result.longitude != null && result.latitude != null) {
+        _latController.text = result.latitude!.toStringAsFixed(2);
+        _longController.text = result.longitude!.toStringAsFixed(2);
       } else {
         enableCustomizeLocation = true;
         // showSnakbar
         ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to get location, please input manually"),
-        ));
+            const SnackBar(
+              content: Text("Failed to get location, please input manually"),
+            ));
       }
+      myLocPlugin.stopLocation();
     });
+    // LocationUtil.getLocation().then((value) {
+    //   if (value != null) {
+    //     _latController.text = value.latitude.toStringAsFixed(2);
+    //     _longController.text = value.longitude.toStringAsFixed(2);
+    //   } else {
+    //     enableCustomizeLocation = true;
+    //     // showSnakbar
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text("Failed to get location, please input manually"),
+    //     ));
+    //   }
+    // });
   }
 
   @override

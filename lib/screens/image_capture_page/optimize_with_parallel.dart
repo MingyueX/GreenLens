@@ -9,31 +9,11 @@ import 'package:ar_flutter_plugin/models/camera_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:GreenLens/theme/colors.dart';
+import 'package:lottie/lottie.dart';
 import 'package:vector_math/vector_math_64.dart' as math_vector;
 
 import '../../base/widgets/line.dart';
 import 'capture_confirmation_screen.dart';
-
-class LinesPainter extends CustomPainter {
-  final List<Line> lines;
-  final double scale;
-
-  LinesPainter({required this.lines, required this.scale});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 3.0 / scale;
-
-    for (var line in lines) {
-      canvas.drawLine(line.start, line.end, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
 
 
 class InteractiveLinesWidget extends StatefulWidget {
@@ -65,6 +45,7 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
   Offset previousTranslation = Offset.zero;
   double rotation = 0.0;
   double previousRotation = 0.0;
+  bool _showAnimation = true;
 
   @override
   void initState() {
@@ -144,33 +125,12 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
     ];
   }
 
-  Offset findLinesCenter(List<Line> lines) {
-    // Simple approach: average of all endpoints
-    double sumX = 0, sumY = 0;
-    int count = 0;
-
-    for (var line in lines) {
-      sumX += line.start.dx + line.end.dx;
-      sumY += line.start.dy + line.end.dy;
-      count += 2; // Each line contributes two points
-    }
-
-    return Offset(sumX / count, sumY / count);
-  }
-
   Matrix4 lineCenteredRotationMatrix(Line line, double scale, Offset translation, double rotation) {
-    // Calculate the center of the line
-    Offset center = Offset((line.start.dx + line.end.dx) / 2.0, (line.start.dy + line.end.dy) / 2.0);
+    Matrix4 matrix = Matrix4.identity();
 
-    // Create a transformation matrix that first translates the line's center to the origin
-    Matrix4 matrix = Matrix4.translationValues(-center.dx, -center.dy, 0);
-
-    // Apply rotation around the origin (which is now the line's center)
+    matrix.scale(scale, scale, 1.0);
+    matrix.translate(translation.dx, translation.dy, 0);
     matrix.rotateZ(rotation);
-
-    // Translate back from the origin to the original center, then apply the global translation and scale
-    matrix.translate(center.dx + translation.dx, center.dy + translation.dy, 0);
-    matrix.scale(scale, scale);
 
     return matrix;
   }
@@ -180,7 +140,16 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
   //   vector = matrix.transform3(vector);
   //   return Offset(vector.x, vector.y);
   // }
-
+  //
+  // List<Line> transformLines(List<Line> originalLines, double scale, Offset translation, double rotation, Offset center) {
+  //   return originalLines.map((line) {
+  //     final transformMatrix = lineCenteredRotationMatrix(line, scale, translation, rotation);
+  //     return Line(
+  //       transformPoint(transformMatrix, line.start),
+  //       transformPoint(transformMatrix, line.end),
+  //     );
+  //   }).toList();
+  // }
   Offset transformPoint(Offset point, double scale, Offset translation, double rotation, Offset center) {
     // Translate point to origin based on center
     Offset translatedToOrigin = point - center;
@@ -219,36 +188,34 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(recorder);
 
+    final screenH = MediaQuery.of(context).size.height;
+    final scaling = screenH / baseImage.height;
+
     // Draw the base image onto the canvas
     paintImage(canvas: canvas, image: baseImage, rect: Rect.fromLTWH(0, 0, baseImage.width.toDouble(), baseImage.height.toDouble()));
 
     final paint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 3.0; // Adjust as needed
-
-    final screenH = MediaQuery.of(context).size.height;
-    final scaling = screenH / baseImage.height;
+      ..strokeWidth = 3.0;
 
     for (var line in lines) {
-      canvas.drawLine(line.start, line.end, paint);
+      canvas.drawLine(line.start / scaling, line.end / scaling, paint);
     }
 
     final ui.Picture picture = recorder.endRecording();
 
     final ui.Image finalImage = await picture.toImage(baseImage.width, baseImage.height);
-    // Encode the ui.Image to a byte format (PNG)
     ByteData? byteData = await finalImage.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-    // Create an Image widget from the byte data
     return Image.memory(pngBytes);
   }
 
 
   @override
   Widget build(BuildContext context) {
-    double imageWidth = widget.cameraImage.width?.toDouble() ?? 0;
-    double imageHeight = widget.cameraImage.height?.toDouble() ?? 0;
+    double imageWidth = widget.image!.width.toDouble() ?? 0;
+    double imageHeight = widget.image!.height.toDouble() ?? 0;
     double screenHeight = MediaQuery.of(context).size.height;
 
     double ratio = screenHeight / imageHeight;
@@ -291,9 +258,9 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
                 child: Transform(
                   alignment: FractionalOffset.center,
                   transform: Matrix4.identity()
-                    ..translate(translation.dx, translation.dy)
+                    ..scale(scale, scale, 1.0)
                     ..rotateZ(rotation)
-                    ..scale(scale),
+                    ..translate(translation.dx, translation.dy),
                   child: CustomPaint(
                     painter: LinesPainter(lines: lines, scale: scale),
                     child: Container(),
@@ -322,8 +289,8 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      // update lines with transforms
                       Offset center = Offset(scaledWidth / 2, scaledHeight / 2);
+                      // Offset center = Offset(imageWidth / 2, imageHeight / 2);
 
                       lines = transformLines(lines, scale, translation, rotation, center);
 
@@ -334,8 +301,8 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
                       imageResult.diameter = result;
                       final newLineJson = getNewLineJson();
                       imageResult.lineJson = newLineJson;
-                      final image = await drawLinesOnImage(widget.cameraImage, lines);
-                      imageResult.displayImage = image;
+                      // final image = await drawLinesOnImage(widget.cameraImage, lines);
+                      // imageResult.displayImage = image;
                       if (mounted && imageResult != null) {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
@@ -353,6 +320,45 @@ class _InteractiveLinesWidgetState extends State<InteractiveLinesWidget> {
                     child: const Text('Confirm'),
                   ),
                 ])),
+          _showAnimation ?
+          // add a gray overlay to the screen when showing animation
+          Center(
+              child:
+              Container(
+                color: Colors.white.withOpacity(0.7),
+                padding: EdgeInsets.all(20),
+                height: double.infinity,
+                width: double.infinity,
+                child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Transform(
+                        alignment: FractionalOffset.center,
+                        // rotate 90 degrees
+                        transform: Matrix4.identity()
+                          ..rotateZ(60 * 3.1415927 / 180),
+                        child:
+                      Lottie.asset('assets/doublefinger.json', width: 300,),
+                      ),
+                      Text('Use two fingers to zoom,', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.baseBlack),),
+                      Text('drag or rotate the lines.', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.baseBlack),),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _showAnimation = false;
+                          });
+                        },
+                        child: const Text('OK'),
+                      )
+                    ],
+                  ),
+            ),
+          ) :
+          Container()
         ]);
   }
 }

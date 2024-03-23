@@ -53,7 +53,7 @@ class Database extends _$Database {
   }
 
   Future<Farmer?> searchFarmer(int id) async {
-    final farmer = await dbQuery.select(farmerTable, (f) => f.id.equals(id));
+    final farmer = await dbQuery.select(farmerTable, (f) => f.participantId.equals(id));
     if (farmer == null) {
       return null;
     }

@@ -56,6 +56,8 @@ dependencies:
   latlong2: ^0.8.0
   camera: ^0.10.5+4
   http: ^0.13.5
+  lottie: ^2.6.0
+  flutter_bmflocation: ^3.6.0
   collection:
 
   ar_flutter_plugin:
@@ -104,6 +106,7 @@ flutter:
   assets:
     - assets/images/
     - assets/map_pin.glb
+    - assets/doublefinger.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

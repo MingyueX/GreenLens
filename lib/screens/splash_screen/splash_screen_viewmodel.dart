@@ -1,4 +1,5 @@
 import 'package:chaquopy/chaquopy.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,9 +17,10 @@ class SplashScreenViewModel extends Cubit<SplashScreenState> {
     await Future.delayed(const Duration(seconds: 2));
     emit(DataLoading());
     try {
+      await loadModel();
       final prefs = await SharedPreferences.getInstance();
       final participantID = prefs.getInt("lastFarmer");
-      await loadModel();
+
       if (participantID != null) {
         final farmer = await dbService.searchFarmer(participantID);
         if (farmer == null) {

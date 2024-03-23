@@ -30,6 +30,10 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data
+                android:name="com.baidu.lbsapi.API_KEY"
+                android:value="lHRpXebQ53SvBD4U8kVTLJ4QnQsmcfPa"
+                />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

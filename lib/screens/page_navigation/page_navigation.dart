@@ -3,9 +3,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:GreenLens/screens/page_navigation/page_nav_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 import '../../../theme/colors.dart';
 import '../../base/widgets/shortcut_to_capture.dart';
+import '../../model/models.dart';
+import '../main_pages/plot_page/plot_page_viewmodel.dart';
+import '../main_pages/profile_page/farmer_provider.dart';
 
 class TabbedPage extends StatefulWidget {
   const TabbedPage({super.key});
@@ -34,6 +38,13 @@ class _TabbedPageState extends State<TabbedPage>
         _viewModel.switchToPage(MainPage.values[_tabController.index], context);
       }
     });
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      Farmer? currentUser = Provider.of<FarmerProvider>(context, listen: false).farmer;
+      await context
+          .read<PlotPageViewModel>()
+          .setFarmer(currentUser.participantId);
+    });
   }
 
   @override
@@ -61,7 +72,7 @@ class _TabbedPageState extends State<TabbedPage>
                       onGenerateRoute: (settings) =>
                           MaterialPageRoute(builder: (_) => page)))
                   .toList()),
-          floatingActionButton: ShortCutButton(),
+          // floatingActionButton: ShortCutButton(),
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(color: AppColors.primaryGreen),
             child: TabBar(

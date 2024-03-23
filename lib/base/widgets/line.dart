@@ -37,4 +37,25 @@ class Line {
   }
 }
 
+class LinesPainter extends CustomPainter {
+  final List<Line> lines;
+  final double scale;
+
+  LinesPainter({required this.lines, required this.scale});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 3.0 / scale;
+
+    for (var line in lines) {
+      canvas.drawLine(line.start, line.end, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 

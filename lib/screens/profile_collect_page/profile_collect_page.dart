@@ -130,9 +130,10 @@ class _ProfileCollectPageState extends State<ProfileCollectPage> {
                                   listen: false)
                               .setFarmer(farmer);
                           final prefs = await SharedPreferences.getInstance();
-                          prefs.setInt("lastFarmer", farmer.participantId);
+                          await prefs.setInt("lastFarmer", farmer.participantId);
                           final dbService = DatabaseService();
                           final existFarmer = await dbService.searchFarmer(farmer.participantId);
+                          print(existFarmer);
                           if (existFarmer != null) {
                             WidgetsBinding.instance.addPostFrameCallback((_) async {
                               if (context.mounted) {
@@ -142,7 +143,7 @@ class _ProfileCollectPageState extends State<ProfileCollectPage> {
                               }
                             });
                           } else {
-                            dbService.insertFarmer(farmer);
+                            await dbService.insertFarmer(farmer);
                           }
                           if (context.mounted) {
                             Navigator.of(context).push(MaterialPageRoute(

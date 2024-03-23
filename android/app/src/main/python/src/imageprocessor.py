@@ -1156,12 +1156,12 @@ def get_lines_meta(canvans_left,canvans_right):
     # 写为一个json文件
     line_info = {
         "left_line": {
-            "top_yx": [int(left_line_meta[0][0]), int(left_line_meta[0][1])],
-            "bottom_yx": [int(left_line_meta[1][0]), int(left_line_meta[1][1])]
+            "top_yx": [int(left_line_meta[0][0])+2, int(left_line_meta[0][1])],
+            "bottom_yx": [int(left_line_meta[1][0])+2, int(left_line_meta[1][1])]
         },
         "right_line": {
-            "top_yx": [int(right_line_meta[0][0]), int(right_line_meta[0][1])],
-            "bottom_yx": [int(right_line_meta[1][0]), int(right_line_meta[1][1])]
+            "top_yx": [int(right_line_meta[0][0])+2, int(right_line_meta[0][1])],
+            "bottom_yx": [int(right_line_meta[1][0])+2, int(right_line_meta[1][1])]
         }
     }
     line_info = json.dumps(line_info)

@@ -13,6 +13,7 @@ import 'package:GreenLens/screens/main_pages/tree_page/img_result_provider.dart'
 import 'package:GreenLens/utils/file_storage.dart';
 import 'dart:ui' as ui;
 
+import '../../base/widgets/line.dart';
 import '../../base/widgets/toast_like_msg.dart';
 import '../../model/models.dart';
 import '../../services/cloud/cloud_storage.dart';
@@ -44,10 +45,23 @@ class CaptureConfirm extends StatelessWidget {
   final double diameter;
   final String lineJson;
 
+  List<Line> parseLines(Map<String, dynamic> json) {
+    return [
+      Line.fromJson(json['left_line']),
+      Line.fromJson(json['right_line']),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenH = MediaQuery.of(context).size.height;
-    final screenW = MediaQuery.of(context).size.width;
+    double imageWidth = cameraImage.width!.toDouble() ?? 0;
+    double imageHeight = cameraImage.height!.toDouble() ?? 0;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double ratio = screenHeight / imageHeight;
+
+    double scaledWidth = imageWidth * ratio;
+    double scaledHeight = imageHeight * ratio;
     return WillPopScope(
         onWillPop: () async {
           await SystemChrome.setPreferredOrientations([
@@ -57,15 +71,34 @@ class CaptureConfirm extends StatelessWidget {
           return true;
         },
         child: Stack(
+          alignment: Alignment.center,
           children: [
-            Center(
-              child: imageResult.displayImage != null
-                  ? imageResult.displayImage!
-                  // ? RawImage(
-                  //     image: imageResult.displayImage!,
-                  //   )
-                  : const Text("No images"),
-            ),
+            // Center(
+            //   child: imageResult.displayImage != null
+            //       ? imageResult.displayImage!
+            //       // ? RawImage(
+            //       //     image: imageResult.displayImage!,
+            //       //   )
+            //       : const Text("No images"),
+            // ),
+            Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1.0)),
+                child: Image.memory(cameraImage.bytes!)),
+            ClipRect(
+              child:
+            Container(
+                alignment: Alignment.center,
+                width: scaledWidth,
+                height: scaledHeight,
+                child: Transform(
+                    alignment: FractionalOffset.center,
+                    transform: Matrix4.identity(),
+                child: CustomPaint(
+                      painter: LinesPainter(lines: parseLines(json.decode(lineJson)), scale: 1),
+                      child: Container(),
+                )))),
             Align(
                 alignment: Alignment.centerLeft,
                 child: Column(

@@ -30,10 +30,10 @@
   <p align="center">
     <h3>An Intuitive App for Accelerating Forest Inventory Mapping :evergreen_tree: </h3>
     <br />
-    <a href="https://apkpure.com/p/com.cleeg.greenlens"><strong>Download the APK » </strong> 📱 </a>
+    <a href="https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup"><strong>Download the APK » </strong> 📱 </a>
     <br />
     <br />
-    <a href="https://www.cambridge.org/engage/coe/article-details/657491c25bc9fcb5c9727f79">View Our Paper :bookmark_tabs:</a>
+    <a href="https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD">View Our Paper :bookmark_tabs:</a>
     ·
     <a href="https://github.com/MingyueX/GreenLens/issues">Report Bug :hammer_and_wrench:</a>
     ·
@@ -108,15 +108,11 @@ If you would like to try our app, please download our [APK](https://apkpure.com/
 If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can refer to the following guidelines to run the app. However, before doing so, we still recommend that you review [our paper](https://www.cambridge.org/engage/coe/article-details/657491c25bc9fcb5c9727f79) to understand the app's architecture, image processing pipeline, and diameter estimation methodology.
 ### Prerequisites 🔑
 
-TODO
+We recommend ARCore version >1.18.
 
 ### Installation ⚒
 
-TODO
-1. Clone the repo
-   ```sh
-   git clone https://github.com/FrankFeng-23/GreenLens.git
-   ```
+Download the APK and install it on your Android device
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

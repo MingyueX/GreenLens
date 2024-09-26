@@ -96,21 +96,20 @@ An ideal approach to forest inventory should be available worldwide for mass ado
 * User Registration/Login
 * Create/Edit/Manage the Plots
 * Create/Edit/Manage Trees in Each Plot
-* Species Identification
 * Record Collection Locations
 * Export Data (Tree ID, DBH, Species, Lat, Lon, RGB, Depth, Boundary...)
 
 <!-- GETTING STARTED -->
 ## Getting Started 🔰
 
-If you would like to try our app, please download our [APK](https://apkpure.com/p/com.cleeg.greenlens) from APKPure and install it on your Android phone. Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
+If you would like to try our app, please download our [APK](https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup) from Google Drive and install it on your Android phone (this might take a while). Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
 
-If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can refer to the following guidelines to run the app. However, before doing so, we still recommend that you review [our paper](https://www.cambridge.org/engage/coe/article-details/657491c25bc9fcb5c9727f79) to understand the app's architecture, image processing pipeline, and diameter estimation methodology.
+If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can refer to the following guidelines to run the app. However, before doing so, we still recommend that you review [our paper](https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD) to understand the app's architecture, image processing pipeline, and diameter estimation methodology.
 ### Prerequisites 🔑
 
 We recommend ARCore version >1.18.
 
-### Installation ⚒
+### Quick Installation ⚒
 
 Download the APK and install it on your Android device
 
@@ -180,11 +179,15 @@ Our Group Link: [Energy and Environment Group](https://www.cst.cam.ac.uk/researc
 <!-- CITATION -->
 ## Citation 📚
 ```
-@article{feng2023trunk,
-  title={A Trunk Diameter Estimation Mobile App for the Masses},
-  author={Feng, Zhengpeng and Xie, Mingyue and Holcomb, Amelia and Keshav, Srinivasan},
-  booktitle={Cambridge Open Engage. doi:10.33774/coe-2023-6z4wb-v2}
-  year={2023}
+@article{FENG2024102774,
+title = {An app for tree trunk diameter estimation from coarse optical depth maps},
+journal = {Ecological Informatics},
+volume = {82},
+pages = {102774},
+year = {2024},
+issn = {1574-9541},
+doi = {https://doi.org/10.1016/j.ecoinf.2024.102774},
+author = {Zhengpeng Feng and Mingyue Xie and Amelia Holcomb and Srinivasan Keshav}
 }
 ```
 

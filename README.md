@@ -102,16 +102,18 @@ An ideal approach to forest inventory should be available worldwide for mass ado
 <!-- GETTING STARTED -->
 ## Getting Started 🔰
 
-If you would like to try our app, please download our [APK](https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup) from Google Drive and install it on your Android phone (this might take a while). Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
+If you would like to try our app, please download our [APK](https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup) from Google Drive and install it on your Android phone (see [Quick Installation](#quick-installation)). Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
 
-If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can refer to the following guidelines to run the app. However, before doing so, we still recommend that you review [our paper](https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD) to understand the app's architecture, image processing pipeline, and diameter estimation methodology.
+If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can clone this repository and open it in a IDE like Android Studio. This also allows you to customize some functionalities. However, before doing so, we recommend that you review [our paper](https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD) to understand the app's implementation details, image processing pipeline, and diameter estimation methodology.
 ### Prerequisites 🔑
 
 We recommend ARCore version >1.18.
 
 ### Quick Installation ⚒
 
-Download the APK and install it on your Android device
+* Download the APK and install it on your Android device
+* Open the app and wait patiently, the app will automatically download some dependencies, so this may take a while.
+* Complete the registration and you're ready to start!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -135,7 +137,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [ ] Multi-language Support
     - [x] English
     - [ ] Chinese
-    - [ ] Spanish
 
 See the [open issues](https://github.com/MingyueX/GreenLens/issues) for a full list of proposed features (and known issues).
 

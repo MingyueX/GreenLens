@@ -6,7 +6,7 @@
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
+*** Reference links are enbaclosed in brackets [ ] instead of parentheses ( ).
 *** See the bottom of this document for the declaration of the reference variables
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
@@ -102,7 +102,7 @@ An ideal approach to forest inventory should be available worldwide for mass ado
 <!-- GETTING STARTED -->
 ## Getting Started 🔰
 
-If you would like to try our app, please download our [APK](https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup) from Google Drive and install it on your Android phone (see [Quick Installation](#quick-installation)). Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
+If you would like to try our app, please download our [APK](https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup) from Google Drive and install it on your Android phone (see [Installation Tutorial](howtoinstall.md)). Before using the app, we strongly recommend checking [Support Device](https://developers.google.com/ar/devices) to ensure device compatibility.
 
 If you are a developer or an ecological researcher interested in understanding how the app operates in depth, you can clone this repository and open it in a IDE like Android Studio. This also allows you to customize some functionalities. However, before doing so, we recommend that you review [our paper](https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD) to understand the app's implementation details, image processing pipeline, and diameter estimation methodology.
 ### Prerequisites 🔑

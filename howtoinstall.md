@@ -1,9 +1,10 @@
-### 如何将app安装在你的安卓手机上（以HuaweiP30为例）
-* 利用手机通过浏览器访问我们的github主页，长按APK链接并选择在浏览器中打开。 （⚠️ 那些安装了Google Drive App的设备在点击链接后可能直接跳转到Google Drive应用，这会使得安装变的复杂。因此，我们强烈在浏览器中打开）
+### How to Install the App on Your Android Phone (Using Huawei P30 as an Example)
+
+* Use your phone's browser to visit our GitHub homepage, long press the APK link, and select "Open in New Tab." (⚠️ Devices with the Google Drive app installed may directly redirect to the Google Drive application when clicking the link, complicating the installation process. Therefore, we strongly recommend opening it in the browser.)
 * <img src="gifs/openinnewtab.gif" width="30%"/>
-* 进入到Google Drive的网页页面，里面你应该只能看到一个文件。单击这个文件，点击下载。由于文件尺寸很大，因此设备可能提示有风险。作为一个开源、免费的树干直径测量软件，我们承诺其中不含任何的木马程序！
+* You should see a single file on the Google Drive webpage. Click on this file and then click "Download." Due to the large file size, your device may warn you about potential risks. As an open-source, free tree diameter measurement software, we assure you that it contains no trojans!
 * <img src="gifs/downloadanyway.gif" width="30%"/>
-* 文件大小约为660mb，因此下载可能需要一些时间。在下载完成之后，来到浏览器的下载管理界面，点击下载好的apk进行安装。
+* The file size is approximately 660 MB, so downloading may take some time. Once the download is complete, go to the browser's download management interface and click on the downloaded APK to install it.
 * <img src="gifs/install.gif" width="30%"/>
-* 打开安装好的GreenLens程序，第一次进入app的时候app会自动下载一些依赖，因此需要等待一段时间。在app初始化完成之后，完成简单的注册就可以开始探索GreenLens了！
-* <img src="gifs/start.gif" width="30%"/>
+* Open the installed GreenLens app; on your first entry, the app will automatically download some dependencies, so please wait for a while. After the app is initialized, complete a simple registration to start exploring GreenLens!
+* <img src="gifs/start.gif" width="30%"/> 

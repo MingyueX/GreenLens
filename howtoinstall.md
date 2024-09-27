@@ -5,7 +5,7 @@
 * You should see a single file on the Google Drive webpage. Click on this file and then click "Download." Due to the large file size, your device may warn you about potential risks. As an open-source, free tree diameter measurement software, we assure you that it contains no trojans!
 * <img src="gifs/step2.png" width="100%"/>
 * The file size is approximately 660 MB, so downloading may take some time. Once the download is complete, go to the browser's download management interface and click on the downloaded APK to install it. After installation, open GreenLens app.
-* <img src="gifs/step3.png" width="100%"/>
+* <img src="gifs/step3_new.png" width="100%"/>
 * On your first entry, the app will automatically download some dependencies, so please wait for a while. After the app is initialized, complete a simple registration to start exploring GreenLens!
 * <img src="gifs/step4.png" width="100%"/>
 

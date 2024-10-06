@@ -33,6 +33,8 @@
     <a href="https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup"><strong>Download the APK » </strong> 📱 </a>
     <br />
     <br />
+    <a href="manual.md">App Manual :📔</a>
+    ·
     <a href="https://www.sciencedirect.com/science/article/pii/S1574954124003169?ssrnid=4786687&dgcid=SSRN_redirect_SD">View Our Paper :bookmark_tabs:</a>
     ·
     <a href="https://github.com/MingyueX/GreenLens/issues">Report Bug :hammer_and_wrench:</a>

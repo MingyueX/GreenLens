@@ -30,7 +30,7 @@
   <p align="center">
     <h3>An Intuitive App for Accelerating Forest Inventory Mapping :evergreen_tree: </h3>
     <br />
-    <a href="https://drive.google.com/drive/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup"><strong>Download the APK » </strong> 📱 </a>
+    <a href="https://drive.google.com/drive/u/1/folders/17-Yu3KXcgJiFapGc2AjJ2dHNC30YUbup"><strong>Download the APK » </strong> 📱 </a>
     <br />
     <br />
     <a href="manual.md">App Manual 📔</a>
